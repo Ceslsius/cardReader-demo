@@ -1,0 +1,333 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> mpvPlayer AppEmit 嵌入APP,支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+ -->
+   <style type="text/css">
+  .Appboxs {
+  margin-top:10px; display: -webkit-box;     display: -moz-box;  display: -ms-flexbox;  display: -webkit-flex;display: flex; display: box;  display: flexbox;  justify-content:space-around;
+}
+</style>  
+</head>
+
+<body >
+
+
+<div class="container">
+<input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+     <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button> &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp; &nbsp; &nbsp; &nbsp;<a href="index.html" target="_blank">hardware Demo</a> &nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed</a>&nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp;  &nbsp; <a href="../login.html" target="_blank">Register</a> 
+      <div >  
+		<div style="font-size:10px">v5 mpvPlayer:   
+				<!-- <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.zhihu.com"}}'/>
+ -->		 	
+ <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value=' {"emit":"open","Obj":"mpvPlayer","AppType":1,"pos":1,"AppId":1,"par":{ "mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov" },"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1,"bgcolor":"2A2937"}}'/>
+	 
+		 <button type="button" id="btn_1" onclick="input_App() " >do it</button>
+		 
+	   <button type="button" id="btn3 " onclick="changeMRL() " >更换播放源 </button> 
+      <button type="button" id="btn3 " onclick="isPaused1() " >isPaused </button> 
+	   <button type="button" id="btn3 " onclick="pause_resume() " >暂停继续 </button> 
+	      <button type="button" id="btn_record" onclick="record() " >录像</button> 
+		    <button type="button" id="btn_record" onclick="takeSnap() " >拍照</button> 
+		  
+	<div style="font-size:10px">  <button type="button" id="btn3 " onclick="regEvent() " >注册事件 </button> 
+	 
+      <button type="button" id="btn3 " onclick="call2app() " >多开 mpvPlayer</button> </div>
+	
+ <div style="font-size:10px">close  :  {"emit":"close","Obj":"mpvPlayer","AppId":1}           &nbsp;  &nbsp; &nbsp;      or   &nbsp;   &nbsp; {"emit":"closeAll","Obj":"mpvPlayer"}</div>      
+
+
+<!--  .Appboxs {
+                margin: 0 30px 0 260px;
+                padding: 40px 0 0 0;
+                position:absolute;绝对
+                top: 30px; 固定上部
+                left: 3%; 左边留成百分比
+                width:1200px;宽度固定
+                }
+ 
+当左右拉动放大缩小浏览器时，不会变化。
+ -->
+ 
+		   </div>
+             <div class="Appboxs" >
+			 
+			 <!--    textarea或者改为div  都可以,绑定嵌入APP的位置, AppEmbed 要一致。如果要跟随浏览器变化大小，设置相对%比例即可-->
+ 		    <div id="AppEmbed1"  style="border: solid 1px #F0F0F0; min-width:30px;min-height:20px;width:400px;height:360px" ></div>
+			 
+			 <div id="AppEmbed2"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:400px;height:360px" ></div>
+    <!--   <div id="AppEmbed1"  style="border: solid 1px #F0F0F0; min-width:30px;min-height:20px;width:1200px;height:400px" ></div>-->
+			                
+		</div>
+	 
+              <div style=" margin-left:1200px; margin-top:1200px;text-align:center ">
+			     测试滚动 
+		</div>  
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+ 
+<script>
+ /**方案说明 
+A 方案 VLC播放RTSP  见rtsp.html , 可以直接libvlc调用，或者网页内核打开，或者转码ogg 或者 webtrc
+B 方案 mplayer播放RTSP  见rtsp2.html
+C 方案 mpvPlayer播放RTSP  见rtsp3.html
+D 方案 easyPlayerRTSP调用ffmpeg库播放RTSP .见rtsp4.html
+//////////////////////////////////////////
+
+
+
+C 方案说明 使用开源程序 mpvPlayer   ,播放本地和网络视频，支持RTSP
+ 关于MPV组件以及相关开发文档:
+https://github.com/mpv-player/mpv
+https://sourceforge.net/projects/mpv-player-windows/files/libmpv/
+https://github.com/mpv-player/mpv/blob/master/libmpv/client.h
+http://mpv.io/manual/master/#options
+http://mpv.io/manual/master/#list-of-input-commands
+http://mpv.io/manual/master/#properties
+https://github.com/mpv-player/mpv-examples/tree/master/libmpv
+ https://buildmedia.readthedocs.org/media/pdf/mpv/latest/mpv.pdf
+ */
+ 
+  //init_App();    //载入页面运行 
+  
+  var webMp4_demo1="https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/n1.mp4"
+  var webRtsp_demo2="rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+  var mp4_demo0="/demo/htmlDemo/file/q1.mp4"
+  	   //"input-default-bindings", "yes");
+		// "input-vo-keyboard", "yes");
+ 
+	/**
+	//参考 https://mpv.io/manual/master/#options
+	  "par":{"engine":{"hwdec":"no"      //  (default) no:   设置硬件加速 none auto any d3d11va dxva2,...
+	            ,"rtsp-transport":"tcp"    //default: tcp  设置通信协议 tcp udp
+	          
+		        }
+		   }
+		   
+		    ,"network-timeout":5       //default: 60  设置网络超时时间 单位秒 报错。   需要单独调用 setOption命令
+	*/
+	
+  //////////////////////////////////////////
+  // 初始参数   option:{name:value} 
+  //  osd 配字  http://mpv.io/manual/master/#options 
+ 
+ //////////////////////////////////////////////
+	var init_App=function(){   
+		AE.InitApp(document.getElementById('input_url').value);
+	
+	}
+ 
+ 	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar0={};
+	       ReqPar0=JSON.parse(document.getElementById("input_par").value);
+		 //  AE.OpenApp(ReqPar);
+	   //执行文本框里的内容
+      AE.OpenApp(ReqPar0);
+		 
+		 
+  }	
+  
+  //////changeMRL 新开////////////
+   function changeMRL(){
+ var  cmd21=AE.txt2code(function(){/*!@preserve
+  {  
+ 
+      AppJsObject.mpvPlayer.newOpen("/demo/htmlDemo/file/q1.mp4" )
+	// AppJsObject.mpvPlayer.newOpen("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov")
+     return  {123}
+  }
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req21={"emit":"runCmd","Obj":"mpvPlayer","rid":"mpvPlayerchangeMRL_mark","AppId":1,"codeStr":cmd21  }     //,"par0":{"AppMethod":"POST"}
+      AE.OpenApp(Req21);
+
+} 
+  record=function(){
+      
+    bt1=document.getElementById('btn_record') 
+    console.log(bt1.innerHTML)
+	if (bt1.innerHTML=="录像"){
+	  //开始录像
+	   AE.OpenApp({"emit":"runCmd","Obj":"mpvPlayer","rid":"mpvPlayerRecord_mark1","AppId":1,"codeStr":"AppJsObject.mpvPlayer.record('/file/video/aa1.mp4')"  } );
+	   bt1.innerHTML="停止录像"
+	}else{
+	 //停止录像
+	 
+	 AE.OpenApp({"emit":"runCmd","Obj":"mpvPlayer","rid":"mpvPlayerRecord_mark1","AppId":1,"codeStr":"AppJsObject.mpvPlayer.record('')"  } );
+	    bt1.innerHTML="录像"
+	}
+ 
+	
+  }
+  //拍照
+  takeSnap=function(){
+  //默认  par0:{"snapPath":"/file/snap/","snapFormat":".bmp"}
+  //默认右键双击开启截图，"snapRBUTTONDBLCLK":false 来取消
+      //AppJsObject.mpvPlayer.takeSnap(path/*或者file/snap/默认时间递增路径*/,flag)
+	 AE.OpenApp({"emit":"runCmd","Obj":"mpvPlayer","rid":"mpvPlayertakeSnap_mark1","AppId":1,"codeStr":"AppJsObject.mpvPlayer.takeSnap()"  } );
+	 
+ 
+	
+  }
+ 
+	////////获取数据//////////////////////////////////////////							  
+ function isPaused1(){
+ var  cmd1=AE.txt2code(function(){/*!@preserve
+  {
+     return  {isPaused:AppJsObject.mpvPlayer.isPaused()}
+  }
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req={"emit":"runCmd","Obj":"mpvPlayer","rid":"mpvPlayerisPaused_mark","AppId":1,"codeStr":cmd1 }    
+      AE.OpenApp(Req);
+
+} 
+ 
+ 
+ //切换 暂停 继续//////////////////////////////////////////////////	 //AppJsFun.log(22)
+ 	  /*
+    if AppJsObject.mpvPlayer.isPaused(){
+	   AppJsObject.mpvPlayer.resume(); 
+	   AppJsFun.log(22);
+	}else{
+	    AppJsObject.mpvPlayer.pause();
+		AppJsFun.log(0);
+	}
+	*/
+ var callback2= function(Jdata,inPar){    //回调的数据Jdata
+ 
+     console.log(Jdata)
+  }		
+ function pause_resume(){
+ var  cmd2=AE.txt2code(function(){/*!@preserve
+     // if AppJsObject.mpvPlayer.isPaused(){AppJsObject.mpvPlayer.resume(); }else{ AppJsObject.mpvPlayer.pause();}
+	//等效toogle
+	AppJsObject.mpvPlayer.toogle();
+	
+	return {AppJsObject.mpvPlayer.isPaused()}
+   
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req2={"emit":"runCmd","Obj":"mpvPlayer","rid":"mpvPlayerpause_resume_mark","AppId":1,"codeStr":cmd2 }    //"AppMark":"mpvPlayerLength_mark"
+ 
+      AE.OpenApp(Req2);
+
+} 
+ 
+  //////////回调函数////////////////////////////////////
+  callback1= function(Jdata,inPar){
+   console.log("call balc 1",Jdata,inPar)  //业务处理，play要考虑 resume之后也会有一个play
+   if (Jdata.data && Jdata.data.first) {
+     console.log("第一次播放成功")
+   
+   }
+ 
+ }
+ 
+    // 如果equ有多个反馈同时相等，都会回调。要确保唯一，可以指定rid或者AppMark
+    AE.callbackFunc= [{"equ": { "Obj":"mpvPlayer",  "event": "play" ,"rep": 0},"func":callback1, "inPar":"inPar 111"}
+	                              ,{"equ": { "Obj":"mpvPlayer",  "rid": "mpvPlayerpause_resume_mark" ,"rep": 0},"func":callback2, "inPar":null}  //测试
+								  ] ;  
+								  
+ 
+
+/////////////////////////注册事件，回调////////////////////////////
+	//   "event":["click","Rclick","resume","play","pause","stop","end","volume","mute","fullscreen","Error","LengthChanged","trackbar","close"] 监控左右单击事件，右键双击截图 左键双击全屏
+	//可以通过回调函数来处理对应的注册事件
+//先定义回调函数
+var eventAll=["click","Rclick","resume","play","pause","stop","end","volume","mute","fullscreen","trackbar","close"]    
+
+ 
+function regEvent(){
+   
+   var ReqPar11={"emit":"open","Obj":"mpvPlayer","AppType":1,"pos":1,"AppId":1,"par":{"mrl":webMp4_demo1},"par0":{"osd":"这是播放源1","minmaxclose":[0,0,1],"volume":70,"autoplay":1,"controls":1,"event":eventAll }}
+     
+      
+	AE.OpenApp(ReqPar11);
+ } 
+ 
+/////////////////////////////////////////////////////////////////////////////////////////
+ //多开  call2app
+ 
+ function call2app(){
+   
+   var ReqPar11=[{"emit":"open","Obj":"mpvPlayer","AppType":1,"pos":1,"AppId":1,"par":{"mrl":webMp4_demo1},"par0":{"autoplay":1}}
+                 ,{"emit":"open","Obj":"mpvPlayer","AppType":1,"pos":1,"AppId":2,"par":{"mrl":webMp4_demo1},"par0":{"autoplay":1}}
+				 ]
+      
+	AE.OpenApp(ReqPar11);
+ } 
+ 
+ /**
+ 更多  
+ 
+封装函数 
+newOpen
+resume
+isPaused
+
+command (.(->->->) = 发送命,\n参数为一个或多个字符串参数,非字符串参数自动调用tostring转换为字符串\n注意MPV组件的任何函数的字符串参数都是使用UTF8编码， 
+commandAsync(.(reply,->->->) = 异步发送命令,参数@1指定回调函数,\n其他为一个或多个字符串参数,非字符串参数自动调用tostring转换为字符串
+loadFile(.(filename) = 加载视频文件,参数指定文件路径或者视频网址\n注意MPV组件的字符串参数都是使用UTF8编码，\n注意MPV组件的任何函数的字符串参数都是使用UTF8编码，
+loadSubtitle(.(filename,flag,title,lang) = 加载字幕文件,\n除参数@1用于指定字幕文件路径以外其他参数可选\n其他参数参考函数源码以及MPV文档
+setSubtitle(.(id) = 切换到指定的字幕\n字幕ID使用getTrackId()函数获取
+pause(.(paused) = 参数为true时暂停,为false时继续播放
+
+seek(.(pos) = 切换到指定位置播放,参数为秒数
+stop() = 停止播放视频
+screenshotToFile(.(filename,flag) =  截图,\n除参数@1用于指定保存文件路径以外其他参数可选\n其他参数参考函数源码以及MPV文档
+setOption(.(name,value) = 设置选项，\n也可以用一个表包含多个键值对用于设置多个选项,\n参考文档 http://mpv.io/manual/master/#options
+setProperty(.(name,value,format) = 设置属性\n如果值不是一个结构体,可用format指定值类型\nformat可选值为"string","bool","double","long","int",\nformat也可以用数值常量指定类型,参考MPV文档，\n所有可用属性参考文档 http://mpv.io/manual/master/#properties
+getProperty(.(name,value) = 获取属性\nvalue参数可以是一个结构体,这时候返回值为结构体\nvalue也可以使用"string","bool","double","long","int"等指定返回值类型,这时候直接返回对应的值\n\n所有可用属性参考文档 http://mpv.io/manual/master/#properties
+getMediaTitle() = 返回视频文件标题
+getVolume() = 返回播放音量
+setVolume(__) = 设置音量，值可以为0到100
+getTrackCount() = 获取轨道数量
+getTrackId(.(索引) = 获取轨道ID
+getTrackType(.(索引) = 获取轨道类型,返回值为字符串\n可能的类型为"video","audio","sub",其中"sub"为加载的字幕
+getTrackSrcId(.(索引) = 获取源文件轨道ID
+getTrackTitle(.(索引) = 获取轨道标题
+getTrackLang(.(索引) = 获取轨道语言
+getTrackDefault (.(索引) = 是否默认轨道
+getTrackForced(.(索引) = 获取轨道强制标识
+getTrackSelected(.(索引) = 获取轨道是否当前选用轨道
+getTrackCodec(.(索引) = 获取轨道解码器名称，例如h264
+getTrackExternal(.(索引) = 获取轨道是否外挂的文件，主要指外挂字幕
+getTrackExternalFile(.(索引) = 获取轨道外挂文件路径
+getTrackFfmpegIndex(.(索引) = 获取轨道FFmpeg索引
+getTrackDecoderDesc(.(索引) = 获取轨道解码成功的友好的解码器名称
+getTrackDemuxSize(.(索引) = 获取轨道大小
+getTrackDemuxChannelCount(.(索引) = 获取通道数
+getTrackDemuxChannels(.(索引) = 获取通道
+getTrackDemuxSamplerate(.(索引) = 获取轨道音频采样率
+getTrackDemuxFps(.(索引) = 获取轨道视频FPS
+getTrackReplaygainTrackPeak(.(索引) = 获取轨道回放增益峰值
+getTrackReplaygainTrackGain(.(索引) = 获取轨道回放增益 
+getTrackReplaygainAlbumPeak(.(索引) = 获取专辑回放增益峰值
+getTrackReplaygainAlbumGain(.(索引) = 获取专辑回放增益峰值
+eventName(.(id) = 使用参数指定的事件ID返回事件名称
+requestLogMessages(.(minLevel) = 设置日志信息级别
+observeProperty(.(name,format) = 订阅属性变更事件\nformat可选值为"string","bool","double","long","int",\n也可以使用 _MPV_FORMAT 前缀的常量指定format\n不指定formart时默认为"double",
+waitEvent(.(timeout) = 等待视频播放器事件\n参数指定超时秒数,如果在界面线程中建议指定为0\n返回的 event.id为0时为无效事件\n此函数也负责触发对象的默认事件，例如onPropertyChange,onEndFile等等\n通常应当在窗口定时器中持续调用此事件
+
+
+*/
+ 
+ 
+</script>
+</body>
+
+</html>

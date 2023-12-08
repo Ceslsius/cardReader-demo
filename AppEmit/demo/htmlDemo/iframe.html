@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <style type="text/css">
+    html,body{ height:100%; margin:0; } 
+    </style>
+    <script type="text/javascript"></script>
+	<script src="http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+	 
+</head>
+<body>
+    <div id="header">hello</div>
+    <div id="container"> 
+		  <button type="button" id="btn_reg" onclick="start_AE()" >打开</button>
+
+	 
+		<div  id="congtentDiv"   style="position:absolute; top:100px; left:150px; border:3px solid #000" width="600" height="500"> </div>
+
+		<iframe  src="iframe_in.html"  style="position:absolute; top:100px; left:80px;" width="700" height="500"> </iframe> 
+		<!--  	  <div   id="AppEmbed1"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:400px;height:400px" ></div>  -->
+    </div>
+	              <div style="margin-top:1900px;text-align:center ">
+			     测试滚动 
+		</div>
+	<script >
+ 
+  var start_AE=function(){
+  //
+     //需要在AppEmit.min.js设置iframeId，用来自动确定iframeId的位置，如果有偏移，可以设置absolutePos，fixedPos_NoPageOffset等参数
+     // 需要设置 iframeId="embed_iframe1";//    嵌入的iframeId的中需要设置 ， 
+	 //本地调试chrome iframe跨域报错 ,在快捷键路径增加 "...\Application\chrome.exe" --disable-web-security --user-data-dir=D:\work\具体目录  
+      var  input_App=function(){
+	        var ReqPar= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"htmlStr":null,"HttpServer_startUrl":null,"URL":"http://www.baidu.com"},                "par0":{"header":null,"noScriptErr":true,"UIFLAG":null,"DLCTL":null,"userAgent":null,"crossDomain":true,"rightMenu":-1,"show_UpdateTool":true    }};
+           AE.OpenApp(ReqPar);
+       }
+	   
+   	  //反馈接口与AE.callbackFunc.equ相等后执行对应的函数，当websocket打开, 再执行AE.callbackFunc.func
+       AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":input_App}   ] ;//连接websocket成功后，执行input_App
+ 
+	   AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" );
+
+ }
+ 
+</script>
+ <!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>   如果使用Gzip压缩解压数据，则需要引入-->
+      
+	    <script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+</body>
+
+
+</html>

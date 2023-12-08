@@ -1,0 +1,51 @@
+/////////////////////////////////  
+//生成dll,并测试
+//加载需要用到的动态库,或静态库
+//在" \lib\tcc\.res\lib" 目录下查找 "动态库名.def" "静态库名.a"
+//也可以使用 vm.addLibPath() 函数添加搜索库的目录,
+//其实下面的DLL已经默认加载,这里仅用于演示。 
+// vm.addIncludePath("")  //添加头文件目录
+// vm.addFile("/bin.o") //添加对象文件
+// vm.addSysIncludePath("") //添加系统头文件目录
+///////////////////
+
+vm.addLib( 
+	"user32",
+	"kernel32",
+	"gdi32"
+) 
+vm.addIncludePath("/dll/dll_c")
+ 
+vm.output( "/dll/out/dll_demo1.dll", AppDll_codeUtf8 ) //编译C源码,生成DLL AppDll开头的变量不要修改
+
+///////////////////////////////// 
+// 调用dll 测试
+// 
+//////////////////////////////////
+import win.ui;
+var winform = ..win.form({})
+winform.messageOnly(); //窗体仅用于处理消息
+import web.json;
+winform.AppOnMsg = function(param){  
+	win.msgbox( param)
+	//win.quitMessage()
+} 
+ 
+//加载生成的DLL
+var dll = raw.loadDll( "/dll/out/dll_demo1.dll" );
+
+//导入API,记住第二个参数需要指定cdecl调用约定(也就是C语言调用约定) HWND hwnd,int sid addr str
+var AppDll_init = dll.api( "AppDll_init","int(ADDR hwnd,string ids,string & msg)", "cdecl" );
+var AppDll_loaded = dll.api( "AppDll_loaded","int(ADDR hwnd,string ids,string & msg)", "cdecl" );
+var AppDll_destroy = dll.api( "AppDll_destroy","int(ADDR hwnd,string ids,string & msg)", "cdecl" );
+var AppDll_RevMsg = dll.api( "AppDll_RevMsg","int(ADDR hwnd,string ids,string & msg)", "cdecl" );
+ 
+var  AppDll_SendMsg = dll.api( "AppDll_SendMsg","int(ADDR hwnd,string ids,string & msg)", "cdecl" );
+  
+
+ var msg='{"a":"好极了ce123"}'; 
+var ids=web.json.stringify({sid="user1001";uid="00000";cid="00000-1";AuthKey="A1-QG7YAE5aUc7CCPSswU6yfhz6ojjZKFu-MPJy6nWAotpxq9QXRBTxJQZehIlpoAPh";rid=-2;clsId="{AE7086AF-ECFE-42F7-B6DC-BC729F90B7AF}"})
+ 
+  AppDll_init( winform.hwnd,ids,msg ); 
+ //AppDll_SendMsg( winform.hwnd, ids,msg ); 
+ 

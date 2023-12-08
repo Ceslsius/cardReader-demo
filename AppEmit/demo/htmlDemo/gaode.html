@@ -1,0 +1,282 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>默认样式信息窗体</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <style>
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+        }
+
+        .content-window-card {
+            position: relative;
+            box-shadow: none;
+            bottom: 0;
+            left: 0;
+            width: auto;
+            padding: 0;
+        }
+
+        .content-window-card p {
+            height: 2rem;
+        }
+
+        .custom-info {
+            border: solid 1px silver;
+        }
+
+        div.info-top {
+            position: relative;
+            background: none repeat scroll 0 0 #F9F9F9;
+            border-bottom: 1px solid #CCC;
+            border-radius: 5px 5px 0 0;
+        }
+
+        div.info-top div {
+            display: inline-block;
+            color: #333333;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 31px;
+            padding: 0 10px;
+        }
+
+        div.info-top img {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition-duration: 0.25s;
+        }
+
+        div.info-top img:hover {
+            box-shadow: 0px 0px 5px #000;
+        }
+
+        div.info-middle {
+            font-size: 12px;
+            padding: 10px 6px;
+            line-height: 20px;
+        }
+
+        div.info-bottom {
+            height: 0px;
+            width: 100%;
+            clear: both;
+            text-align: center;
+        }
+
+        div.info-bottom img {
+            position: relative;
+            z-index: 104;
+        }
+
+        span {
+            margin-left: 5px;
+            font-size: 11px;
+        }
+
+        .info-middle img {
+            float: left;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div class="info">
+    点击地图上的点标记，打开所添加的自定义信息窗体
+</div>
+ <!-- 如果使用Gzip压缩解压数据，则需要引入 <script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>   -->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.4.15&key=修改为自己的key"></script>
+		
+<script type="text/javascript">    //地图初始化时，在地图上添加一个marker标记,鼠标点击marker可弹出自定义的信息窗体
+
+   
+ //////////首先连接好 websocket一次,没有必要每次弹窗都执行InitApp///////////////////////
+   AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");    //启动websocket 
+   var targetNode ;
+ var targetNode_oldOffset={"left":0,"top":0};
+ var observer;var hideMark=0;
+ var container_amap_layer=null;
+   var MutationObserver = window.MutationObserver || window.webkitMutationObserver || window.MozMutationObserver;
+// MozMutationObserver是优化代码
+var fixedOffsetAuto_callback = function(mutationsList, observer) {
+	// Use traditional 'for loops' for IE 11
+	for(  k in mutationsList) {
+	       
+		   if (mutationsList[k].type === 'attributes' && mutationsList[k].target.getAttribute("class")==targetNode.getAttribute("class")  ) {
+  
+			 if (targetNode_oldOffset.left!=mutationsList[k].target.offsetLeft || targetNode_oldOffset.top!=mutationsList[k].target.offsetTop) {
+		 		 targetNode_oldOffset.left =mutationsList[k].target.offsetLeft; targetNode_oldOffset.top =mutationsList[k].target.offsetTop;
+			    //修正  fixed=ture  offset: 'auto' F12调试窗口改变时的情况  
+				      AE.absolutePos={"left":targetNode_oldOffset.left,"top":targetNode_oldOffset.top-340}   //offsetTop 为标记点的位置，不是窗口的位置， 340 为视频的高度+边框的高度
+		 			 
+					 //debounce 防抖 或者throttle节流
+				 AE.debounce(AE.AppPosEvent("move",{},1,AE.EVENTTYPE["move"]),100,0);  //"move",{},1 表示更新位置 , debounce(fun, 80毫秒间隔,    1 延迟执行，0立即执行) 或者throttle
+					  
+					  
+		       //可以判断节点位置，来更新App的位置或者大小,可以在对应的注册事件中加载移动,改变大小,显示,隐藏。  AE.AppPosEvent("resize",{},1,AE.EVENTTYPE["resize"]); 
+               // 增加显示  
+			  /*
+                //  console.log(container_amap_layer.offsetLeft,container_amap_layer.offsetTop,container_amap_layer.offsetWidth,container_amap_layer.offsetHeight)  
+			     if ( AE.absolutePos.left<container_amap_layer.offsetLeft-100 || AE.absolutePos.top<container_amap_layer.offsetTop-100)    {  //判断 需要优化，应该是地图 container 左右上下的位置
+				   // console.log("hide")
+				    hideMark=1
+				    AE.AppPosEvent("hide",{},-1,AE.EVENTTYPE["visible"]); //-1 表示不发送位置
+				 }else if ((AE.absolutePos.left>=container_amap_layer.offsetLeft-100 || AE.absolutePos.top>=container_amap_layer.offsetTop-100) && hideMark )  { //判断 需要优化，应该是地图 container 左右上下的位置
+				   // console.log("show")
+				    hideMark=0;
+				    AE.AppPosEvent("show",{},-1,AE.EVENTTYPE["visible"]);   //-1 表示不发送位置
+			   //增加隐藏//判断 需要优化，应该是地图的 左右上下的位置
+			      }
+				  
+				  */
+			 }
+ 
+		}
+	}
+};
+
+
+function observer_infoWindow(){
+ 
+	  
+         observer = new MutationObserver(fixedOffsetAuto_callback);
+	   //targetNode = document.getElementsByClassName("amap-info");   //0: div.amap-info
+	   targetNode= document.querySelector(".amap-info")
+	   
+       observer.observe(targetNode, { attributes: true, childList: false, subtree: false });
+}
+
+function showRTSP(){
+          container_amap_layer= document.querySelector(".amap-layer");
+	    var amap= document.querySelector(".amap-info")
+		// AE.fixedPos_NoPageOffset=true;  // 固定则  不计算PageOffset
+		 targetNode_oldOffset={"left":amap.offsetLeft,"top":amap.offsetTop-340}   //offsetTop 为标记点的位置，不是窗口的位置， 340 为视频的高度+边框的高度
+	 	 AE.absolutePos=targetNode_oldOffset;   //初始位置
+		  AE.zeroType=false;    //显示的App可以显示在负数坐标范围, 默认true只能移动到(0,0)
+		 AE.OpenApp({"emit":"open","Obj":"libvlc","AppType":1,"AppId":1,"pos":1,"par":{"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0}});
+ 
+		 observer_infoWindow()
+	 
+		 
+}		
+ 
+///////////////////////////////////////////////////////////////////////
+
+// https://lbs.amap.com/demo/javascript-api/example/event-overlay/infowindow-event
+
+var map = new AMap.Map("container", {
+    resizeEnable: true,
+    center: [116.481181, 39.989792],
+    zoom: 16
+});
+addMarker();
+
+ 
+
+
+//添加marker标记
+function addMarker() {
+    map.clearMap();
+    var marker = new AMap.Marker({
+        map: map,
+        position: [116.481181, 39.989792]
+    });
+    //鼠标点击marker弹出自定义的信息窗体
+    AMap.event.addListener(marker, 'click', function () {
+	    
+        infoWindow.open(map, marker.getPosition());
+       /*
+        var existCondition = setInterval(function() {
+		 if (document.querySelector(".amap-info")) {   //不确定是否有多个
+			 clearInterval(existCondition);
+			 showRTSP();
+		 }
+		}, 10);
+		*/
+        setTimeout(showRTSP,200);  
+    });
+	
+	
+
+}
+
+
+
+//实例化信息窗体
+var title = '方恒假日酒店<span style="font-size:11px;color:#F00;">价格:318</span>',
+    content = [];
+content.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
+content.push("电话：010-64733333");
+content.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
+content.push('<div id="AppEmbed1"  style=" border: solid 3px #F0F0F0; min-width:30px;min-height:20px;width:320px;height:200px" ></div>')
+var infoWindow = new AMap.InfoWindow({
+    isCustom: true,  //使用自定义窗体
+    content: createInfoWindow(title, content.join("<br/>")),
+    offset: new AMap.Pixel(16, -45)
+});
+
+ 
+//构建自定义信息窗体
+function createInfoWindow(title, content) {
+    var info = document.createElement("div");
+    info.className = "custom-info input-card content-window-card";
+
+    //可以通过下面的方式修改自定义窗体的宽高
+    //info.style.width = "400px";
+    // 定义顶部标题
+    var top = document.createElement("div");
+    var titleD = document.createElement("div");
+    var closeX = document.createElement("img");
+    top.className = "info-top";
+    titleD.innerHTML = title;
+    closeX.src = "https://webapi.amap.com/images/close2.gif";
+    closeX.onclick = closeInfoWindow;
+
+    top.appendChild(titleD);
+    top.appendChild(closeX);
+    info.appendChild(top);
+
+    // 定义中部内容
+    var middle = document.createElement("div");
+    middle.className = "info-middle";
+    middle.style.backgroundColor = 'white';
+    middle.innerHTML = content;
+    info.appendChild(middle);
+
+    // 定义底部内容
+    var bottom = document.createElement("div");
+    bottom.className = "info-bottom";
+    bottom.style.position = 'relative';
+    bottom.style.top = '0px';
+    bottom.style.margin = '0 auto';
+    var sharp = document.createElement("img");
+    sharp.src = "https://webapi.amap.com/images/sharp.png";
+    bottom.appendChild(sharp);
+    info.appendChild(bottom);
+	
+
+	 
+    return info;
+}
+
+
+
+//关闭信息窗体
+function closeInfoWindow() {
+    if (observer) observer.disconnect();  //关闭监控
+     AE.CloseApp({});   //关闭当前所有App   ， 指定AppId则关闭对应的
+    map.clearInfoWindow();
+	
+}
+</script>
+</body>
+</html>

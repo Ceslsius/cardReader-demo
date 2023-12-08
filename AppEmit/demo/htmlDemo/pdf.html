@@ -1,0 +1,263 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit  PDF  </title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+      <style type="text/css">
+        html,body{
+            height: 100%;
+	      width:100%
+        }
+    body{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+     <div style="font-size:10px">1 .pdf
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"pdf","AppType":1,"AppFollow":31,"src":"/demo/htmlDemo/file/3d.PDF","pos":1,"par0":{"objName":"pdf","HttpPost":null,"show_UpdateTool":true}}'/>
+		   	<button type="button" id="btn_Flash" onclick="input_App() " >do it</button>&nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp;&nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed  </a> &nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a> &nbsp; &nbsp;<a href="index.html" target="_blank">index</a> 
+		   </div>
+          <div style="font-size:10px"> 2.打开网络，默认保存上传  {"emit":"open","Obj":"pdf","AppType":1,"AppFollow":31,"src":[["https://cdn.jsdelivr.net/gh/appemit/AppemitWeb@master/docs/demo/file/p1.pdf","p1.pdf"]],"pos":1,"par0":{"objName":"pdf","show_UpdateTool":true}}                                                                                             
+	 <button type="button" id="btn2" onclick="cmd_runcode() " > 显示工具栏反馈src</button>  
+ 
+   <button type="button" id="btn2" onclick="UploadFile() " >推荐手动上传</button> 
+     <div>  <button type="button" id="btn2" onclick="webPdf() " >3 网页方式打开</button>   </div>
+   
+     <button type="button" id="btn2" onclick='AE.OpenApp({"emit":"close","Obj":"pdf","AppId":1,"par0":{}}) ' >关闭</button> 
+   
+     <div style="font-size:10px">  close : {"emit":"close","Obj":"pdf","AppId":1,"par0":{}}       or     {"emit":"closeAll","Obj":"pdf","par0":{}}  </div>
+</div>
+
+ <div   id="AppEmbed1"  style="border:none; 	width:80%;height:520px" ></div>
+	 
+ 
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+/**
+
+  //inPar["src"]={"demo/htmlDemo/file/pdf1.dwg"}
+ // inPar["src"]={{"https://cdn.jsdelivr.net/gh/appemit/AppemitWeb@master/docs/demo/file/pdf1.dwg";"pdf1.dwg"}}
+ 
+   1 默认pdf的"progId":   progId="AcroPDF.PDF.1" ,{CA8A9780-280D-11CF-A24D-444553540000}
+     全局变量 对象  AppJsObject     AppJsObject.objName 访问实例对象,默认pdf则为 AppJsObject.pdf 访问
+    2 reg3D  默认为[HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\DC\3D] 注册
+     "reg3D":{"b3DAllowSelect":1,"b3DAnimateCamera":1,"b3DCollapseTools":1,"i3DDegrade":1,"i3DDegradeFPS":f,"b3DDisplayOrientationAxis":1,"b3DDontQualiyRenderers":0,"b3DEnableContent":1,"i3DPMIPrefRendering":0,"t3DPreferredRenderer":"DirectX 9","b3DRenderDoubleSided":0,"b3DRenderPointAsCross":0,"i3DShowPanel":2,"i3DShowToolbar":2}
+      "reg3D":false则不判断是否注册。
+	  
+	  
+*/
+  /////////////方法1 ATL 方式打开com组件/
+  //默认 "progId":"AcroPDF.PDF.1", "CurrentPage":1,"ShowToolbar":false,"View":"fix"
+	    var init_mark=  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&flag=1");
+ 
+ 	//pdf
+ 	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+		  
+ 	 
+	   	   AE.OpenApp(ReqPar);
+  }
+ 
+    //打开pdf
+ 
+ 
+ /////////操作pdf对象//////////////////////////////////////////////
+ UploadFile=function(){
+  //上传 AppJsObject.pdf.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1}) //反馈code=200为成功
+ 
+ 	  var Req={"emit":"runCmd","Obj":"pdf","AppId":1,"codeStr":'AppJsObject.pdf.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1})' ,"par0":{}}   
+  
+      AE.OpenApp( Req );
+ 
+ }
+
+ 
+ 
+//发送命令
+ 
+cmd_runcode =function(){
+ //通过 AppJsObject.pdf 来调用来调用pdf,也可以定义一个 var pdf=AppJsObject.pdf; 用pdf来缩写
+
+   //注意 结尾一定要有;  或者\r\n 
+  //vue需要使用 AE.txt2code_Vue
+var	codeStr1 =   AE.txt2code(function(){/*!@preserve
+AppJsObject.pdf.setShowToolbar(true);   //显示Toolbar
+ return {src:AppJsObject.pdf.src}    //反馈src
+*/});
+ 
+ 
+   var  Req3={"emit":"runCmd","Obj":"pdf","AppId":1,"codeStr":codeStr1,"par0":{} }   
+  
+
+      AE.OpenApp( Req3 );
+
+}
+
+
+/////////////方法2 "AppType":2网页版 打开 IE "kernel":1 /////////////////////////////// 
+function webPdf(){
+//注意 /script 需要改变为 \/script     pdf1.SetShowToolbar(false);  //显示工具栏(false为隐藏)    
+var	htmlStr1 =   AE.txt2code(function(){/*!@preserve
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<div align="center">
+	     <a href="javascript:tool1();">工具栏</a>    <a href="javascript:reback();">反馈数据</a>  
+			   <object id="pdf1" classid="clsid:CA8A9780-280D-11CF-A24D-444553540000" width="950" height="562" border="0">
+				<param name="src" value="https://cdn.jsdelivr.net/gh/appemit/AppemitWeb@master/docs/demo/file/p1.pdf" />
+			 </object>
+		</div>
+	</body>
+</html>
+<script>
+     tool1=function(){
+	     pdf1.SetShowToolbar(true);
+	 }
+	   reback=function(){
+	      
+		  external.emitBack("{src:"+pdf1.src+"}")   //json  str
+	   
+	 } 
+ 
+ <\/script>
+*/});
+
+    //  var  Req3={"emit":"open","Obj":"web","AppId":1,"AppType":1,"kernel":1,"pos":1,"AppFollow":31,"par":{"URL":null,"htmlStr":htmlStr1,"HttpServer_startUrl":null},"par0":{}  }   
+  
+      var  Req3={"emit":"open","Obj":"pdf","AppId":1,"AppType":2,"kernel":1,"pos":1,"AppFollow":31,"par":{"URL":null,"htmlStr":htmlStr1,"HttpServer_startUrl":null},"par0":{}  }   
+ 
+
+      AE.OpenApp( Req3 );
+
+}
+
+
+ 
+
+
+
+ /**
+ 
+<param name="_Version" value="65539">
+<param name="_ExtentX" value="20108">
+<param name="_ExtentY" value="10866">
+<param name="_StockProps" value="0">
+ 
+<OBJECT id="acro" classid="clsid:CA8A9780-280D-11CF-A24D-444553540000" WIDTH="1000" HEIGHT="800">
+    <PARAM name="src" value="./304100621001JY01802-0-01.pdf"/>
+</OBJECT> 
+
+ 永久启用 3D 内容：https://helpx.adobe.com/cn/acrobat/using/enable-3d-content-pdf.html    https://www.adobe.com/devnet-docs/acrobatetk/tools/AppSec/external.html#d-content
+转到“编辑”>“首选项”>“3D 和多媒体”，然后选中“启用 3D 内容播放”复选框。
+ 启用可信任内容的 3D 内容
+3D 内容已集成到 Trust Framework 中，因此即使在停用 3D 的情况下，也可以显示受信任内容的 3D 内容。该功能的工作流程如下所示：
+停用 3D 内容。
+通过“编辑”>“首选项”>“安全性(增强)”>“特权位置”面板，将文件、文件夹和主机设为特权位置。
+在打开含有 3D 内容的 PDF 时：
+如果相应的文件/位置在“特权位置”中，则 3D 内容能够呈现。
+如果不是受信任的文件/位置，则显示黄色消息栏：“已停用 3D 内容。如果您信任此文档，请启用该功能。”“选项”按钮针对当前文档提供“只信任此文档一次”和“总是信任此文档”选项。
+企业 IT 人员可以通过 HKCU\Software\Adobe\Acrobat Reader\<版本>\3D\bEnable3DContent 配置最终用户设置。
+企业 IT 人员可以通过 HKLM\SOFTWARE\Policies\Adobe\(产品名称)\(版本)\FeatureLockDown\bEnable3D 停用和锁定 3D 呈现功能，让用户无法更改设置。
+
+ 
+ 
+ Adobe Acrobat Control for ActiveX
+ 
+      2、GoBackwardStack：如果前面的视图存在，则转到视图堆栈上的先前视图。前面的视图可能在不同的文档中
+      3、GoForwardStack：如果下一个视图存在，则转到视图堆栈的下一个视图。下一个视图可能在另一个文档中
+      4、GotoFirstPage：转到文档的第一页，保持页面内的当前位置和缩放级别
+      5、GotoLastPage：进入文档的最后一页，保持页面内的当前位置和缩放级别
+      6、GotoNextPage：如果存在，则进入文档的下一页。保持页面内的当前位置和缩放级别
+      7、GotoPreviousPage：如果存在，则进入文档的前一页。保持页面内的当前位置和缩放级别
+      8、LoadFile：打开并在浏览器中显示指定的文档
+      9、PostMessage：（这个函数没有被Adobe记录下来）
+      10、Print：根据用户对话框中选择的选项打印文档。这些选项包括嵌入式打印(在给定页面上的一个边界矩形内打印)，以及对指定的打印机进行交互式打印。
+      11、PrintAll：在不显示用户对话框的情况下打印整个文档。使用默认的打印机、页面设置和作业设置。
+      12、PrintAllFit：在不显示用户对话框的情况下打印整个文档，如果需要，页面会缩小，以适应打印机中页面的可想象区域。使用默认的打印机、页面设置和作业设置。
+      *注：其有1个参数，在打印文档时确定是否要缩放可映像区域。值为0表示不应该使用扩展，而正值值表明，如果需要，页面会缩小，以适应打印机中页面的可想象区域。
+      13、PrintPages：打印指定的页面，而不显示用户对话框。使用默认的打印机、页面设置和作业设置。
+      *注：其有2个参数，指定打印第几页到第几页
+      14、PrintPagesFit：打印指定的页面，而不显示用户对话框。使用默认的打印机、页面设置和作业设置
+      *注：其中第3个参数表示在打印文档时确定是否要缩放可映像区域。值为0表示不应该使用扩展，而正值值表明，如果需要，页面会缩小，以适应打印机中页面的可想象区域。
+      15、PrintWithDialog：根据用户对话框中选择的选项打印文档。这些选项包括嵌入式打印(在给定页面上的一个边界矩形内打印)，以及对指定的打印机进行交互式打印。
+      16、SetCurrentHighlight：突出显示当前页面中指定的边界矩形中的文本选择。
+      17、SetCurrentPage：转到文档中指定的页面。保持页面内的当前位置和缩放级别
+      18、SetLayoutMode：根据指定的值设置页面视图的布局模式
+      19、SetNamedDest：将页面视图更改为指定字符串中的指定目标
+      20、SetPageMode：根据指定的值设置页面模式
+      21、ShowScrollbars：确定滚动条是否会出现在文档视图中
+      22、ShowToolbar：确定工具栏是否会出现在查看器中
+      23、SetView：根据指定的字符串设置页面的视图
+      24、SetViewRect：根据指定的坐标设置视图矩形（X偏移，Y偏移，宽度，高度）
+      25、SetViewScroll：根据指定的字符串设置页面的视图。根据视图模式，页面要么滚动到右边，要么按偏移量指定的数量进行滚动。
+      26、Zoom：根据指定的值设置放大率
+      27、SetZoomScroll：根据指定的值设置放大率，并根据指定的数量水平和垂直滚动页面视图。
+ 
+ 下面是导出的19版本 的接口函数
+ 
+ Name: IAcroAXDocShim
+HelpString: IAcroAXDocShim Interface
+Interface:  {3B813CE7-7C10-4F84-AD06-9DF76D97A9AA}
+
+ID:0x60000000: QueryInterface(pointer, pointer&)
+ID:0x60000001: AddRef()
+ID:0x60000002: Release()
+ID:0x60010000: GetTypeInfoCount(pointer&)
+ID:0x60010001: GetTypeInfo(INT, INT, pointer&)
+ID:0x60010002: GetIDsOfNames(pointer, pointer, INT, INT, pointer&)
+ID:0x60010003: Invoke(int, pointer, INT, WROD, pointer, pointer&, pointer&, poin
+ter&)
+ID:0x1: src _get
+ID:0x1: src(string)
+ID:0x2: LoadFile(string)
+ID:0x3: setShowToolbar(bool)
+ID:0x4: gotoFirstPage()
+ID:0x5: gotoLastPage()
+ID:0x6: gotoNextPage()
+ID:0x7: gotoPreviousPage()
+ID:0x8: setCurrentPage(int)
+ID:0x9: goForwardStack()
+ID:0xA: goBackwardStack()
+ID:0xB: setPageMode(string)
+ID:0xC: setLayoutMode(string)
+ID:0xD: setNamedDest(string)
+ID:0xE: Print()
+ID:0xF: printWithDialog()
+ID:0x10: setZoom(float)
+ID:0x11: setZoomScroll(float, float, float)
+ID:0x12: setView(string)
+ID:0x13: setViewScroll(string, float)
+ID:0x14: setViewRect(float, float, float, float)
+ID:0x15: printPages(int, int)
+ID:0x16: printPagesFit(int, int, bool)
+ID:0x17: printAll()
+ID:0x18: printAllFit(bool)
+ID:0x19: setShowScrollbars(bool)
+ID:0x1A: GetVersions()
+ID:0x1B: setCurrentHightlight(int, int, int, int)
+ID:0x1C: setCurrentHighlight(int, int, int, int)
+ID:0x1D: postMessage(pointer )
+ID:0x1E: messageHandler _get
+ID:0x1E: messageHandler(pointer )
+ID:0x1F: execCommand(pointer )
+
+
+
+ */
+
+
+</script>
+</body>
+</html>

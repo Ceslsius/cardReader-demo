@@ -1,0 +1,157 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 中间件,可以嵌入可以嵌入各类程序，包括flash、office,cad等</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件。可在各个程序之间通信。">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+	-->
+
+ 
+</head>
+<body>
+
+
+<div class="container">
+    
+
+             <div style="font-size:10px">0. install/open Appemit.exe (F12 see console info)   &nbsp; &nbsp; &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp;&nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed </a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a> &nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp; &nbsp;<a href="../login.html" target="_blank">Register</a> </div>
+			<div style="font-size:10px"> 1. connet websocket,support wss
+			<input type="text" class="form-control" size="80" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=10066-1&sid=1&flag=1" />
+			 <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button>
+			 </div>
+
+
+			<div style="font-size:10px">2. 修改ini文件和认证文件
+			 			<button type="button" id="btn1" onclick=" AE.OpenApp(req_ini);" >do it </button>
+			</div>
+		 
+ 
+				 <div>
+		 
+				 <div   style="min-width:30px;min-height:10px;width:600px;height:100px" ></div>
+				 <div  id="AppEmbedOut" style="float:left;width:40%"></div>  
+				  <div style="margin-top:10px;text-align:center;float:right;width:60%  ">
+				 <!--    textarea或者改为div  ， AppEmbed 要一致 -->
+					<textarea readonly id="AppEmbed1"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:700px;height:300px" ></textarea>
+					<div   style="min-width:30px;min-height:5px;width:600px;height:20px" ></div>
+					<textarea readonly id="AppEmbed2"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:700px;height:300px" ></textarea>
+			    </div>
+				<div   style="min-width:30px;min-height:700px;width:600px;height:700px" ></div>
+				<div   style="min-width:30px;min-height:5px;width:600px;height:700px" >测试<a href="appemitWeb://">启动 appemit</a></div>
+		</div>  
+</div>
+ <!-- 如果使用Gzip压缩解压数据，则需要引入
+<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>   
+-->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+
+<script type="text/javascript">
+
+//必须局域网用户，验证通过后，修改 本用户的UID 的配置
+
+ 
+ 
+ //可调整的参数     
+ 
+	var init_App=function(){   
+	 AE.InitApp(document.getElementById('input_url').value);
+	 
+	//  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=0");
+		 
+	}
+	   
+	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+ 
+	   	  AE.OpenApp(ReqPar);            //数组内多条消息异步打开APP
+		   // AE.OpenApp_sync(ReqPar);     //数组内多条消息同步打开 
+ 
+	   }
+	   
+	   
+var req_ini= {"emit":"setPar","Obj":"app","par":{"ini_userSet":{"certFile":"/bin/cert/2021new.crt","keyFile":"/bin/cert/2021new.key"},"SSLfile":[{"path":"/bin/cert/2021new.crt",
+"str":`-----BEGIN CERTIFICATE-----
+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
+C139oAMuil4a4fxiTcwk9A==
+-----END CERTIFICATE-----`
+}
+,{"path":"/bin/cert/2021new.key",
+"str":`-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAnBnN8tVLzUoJOBDftzxhTqXBmlE4xps+8/8UpZD73QSG3Wgg
+4EWDrfhVubTxSGk867kZyxztKCf2zdt3yG+xPn5gh3oR4FASKJ7+r8DJHoo4ZS8M
+1lUyDmVaEDUklM3E7oqD84MaWndvUrhFqj9AlmPx/TaQ92lvHqTr+jLmdq3i595i
+WTgFqa+VenWPNimFbi7fhbb72dY4m9xOW4jBlp+zcjB6dhX8dtEGII3qF9Lq1ny/
+8BAFoL2Pe44PMvEHr4C+kNkwcYQ/Qjf8JkiR3J+27LbIqtCa3aZSiYM+Bu05rx7i
+uwEfKn2NpyHfUQp4lUoiXoapc0hlmdL0A681MwIDAQABAoIBABjZULv9sT3iMbp/
+kSVJktHiuAF5OXkAIJLVwbMjc7x4qoFXQJiC6FXKyNaxk5Er03tQsWbwWV5Bklut
+upEpGoVwt6wJRgw3otRdjvxqS3m1lgmhZkE+OaQqBR68XvDjGpzAZwXeElVhWtLH
+q6tQu1bVXSGqTIRd/8bYiQoAjUhJ4R93F0YX1NeelezreHUfd53hA5MHXVtq17R4
+rC0KfhWBgY81KH5feYRi1f/HI7k0MwSW3bNm56pYwARMKigwJn3vx8FaQqSKFxV3
+Zd54Cp+oH/yg71Va2UWq0SMAfbOd/8v/EMolmk7DnCClx8JceJ1aYz5eHvV5yAEE
+YwfMFq0CgYEA1jmMi9hVlftsXYZNS/AWy03ZoIMa++F8oORXvPuHGgftcwmKWnfO
+4Erhl32BJF4gnLzvwOW9JdMwwQwB9GCw/V0/+GXGBH6iyhGOcEM/Alvfbc1WuQJp
+mIYVSPPPZ3XwrMn7t9bKJsiPFsXsw5nYgzmvqT2diMbnkFOY5sHWtQUCgYEAuoqc
+Ubt31Fb0pQDrggqa/zG6TDLdwQ7ojVdwh0Wo9/VgU9m3ybPBJ+3X/P7SPDoC4n2S
+x7+ArI9Ys6mv8dU/pK4Lrg5EHT4imuFRHO0WkFUXNeDERBC8iSH77s4jbEMVX5Wf
+gqlDXQgC7qvc0f90upRl7vUGyXK7H648mkbP1tcCgYAdJcVmva+fcY8kBoL74xXm
+4ZfLzCrevKZtacQ6VWrjctKvBUxK1ORUBjw9lXj9zsTXLqnccCXVQK/whEa7znAm
+eQqcLJTNxcE2hz7/LVckZgW3denn0Fk3xH6e53V/2T8+81iJgfMNZdp6OcHmN0eL
+S00IVPbbRlz5eTZjp1okVQKBgEwyZlv0aaQwyMnFsG10C5AGLgUGGhLMFi31858t
+0zFF580Yd7xKUrIOs1VCeXnkcF030gcJsHPMMf1haN8trkuEVH0KksQnJ1eAhfN8
+3OSj/VEiuMjc1UZmvVP0m/+S/14F7hwfK8cKiLgZN6AH6xRznZeYOud6l/j+4P5b
+wnYNAoGAJXs/KPZezhmvTXawtdqIKYVqfwta8cwMYwBuRH5EDB0Iy6Cq0H/eglGr
+APg/4y4K7A6hVx5RuUuYt9Kq8F1ed84jueUDASmKv7bmKVuZfBUetECslVubrYbw
+LFgav/07oIInJNtUIRKpApnaSmNracFT8HkcMXZPqb92HlR4OYg=
+-----END RSA PRIVATE KEY-----`}
+]}}	
+  
+  
+  
+  
+ 
+</script>
+</body>
+
+ 
+
+</html>

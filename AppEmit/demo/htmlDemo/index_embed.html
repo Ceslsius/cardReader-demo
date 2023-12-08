@@ -1,0 +1,279 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"
+
+ 
+针对签名程序可以优化的设置
+        
+	   appemit.js里面wsInit 中 showPar:-1   这样在zoom浏览器时候PDF强制刷新 (  下载版本 默认 null )
+	   
+	   如果不想要embed.html,可以通过AE.txt2code 形式，设置 htmlStr
+	   
+	   可以参考autoEmbed.html对不同的浏览器分流考虑
+	   如果回调很难区分，可以设置AppMark来标识
+ 
+ DNS配置 local.name.com  A指向127.0.0.1  下载 local.name.com的SSL的证书，拷贝Apache下的crt 、key文件到bin/cert中
+ 设置config.ini ，[userSet]字段下配置certFile，keyFile，要求名称一致。重启程序。
+certFile=/bin/cert/local_AE_2021.crt
+keyFile=/bin/cert/local_AE_2021.key
+
+ 后续使用 wss://local.name.com:443/appemit?cid=00000-1&sid=1&flag=1  来访问。
+ 
+ 测试 wss://local.appemit.com:443/appemit?cid=00000-1&sid=1&flag=1
+ 
+ 手动修改  ipconfig /flushdns
+ 
+ 
+ 
+-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,dll Ocx支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ <!-- <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script> -->
+ 
+   <style type="text/css">
+  .Appboxs {
+    margin-top:10px;
+     justify-content:space-around;
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex 
+    display: flex; 
+   display: box;
+  display: flexbox;
+
+}
+</style>  
+ 
+</head>
+
+<body >
+
+
+<div class="container">
+<input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+     <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button> &nbsp;  &nbsp; &nbsp;<div >  
+		<div style="font-size:10px">w1. webtype:   
+ 		 
+          <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":null,"htmlStr":null,"HttpServer_startUrl":"/demo/htmlDemo/embed.html"}} '/>
+	  <button type="button"  onclick="input_do() " >do it</button> 
+	  	<button type="button" onclick="AE.OpenApp(ReqPar9) " >打开文档ReqPar9</button> 
+
+     <button type="button"   onclick="AE.OpenApp(ReqPar8) " >反馈jquery节点8</button> 
+	      <button type="button"   onclick="AE.OpenApp(ReqPar81) " >getEle反馈节点811</button> 
+  <button type="button"  onclick="AE.OpenApp(ReqPar6) " >执行JS反馈 ReqPar6</button> 
+ 
+	 <button type="button"   onclick="AE.OpenApp(ReqPar42) " > 打开网页前设置cookie</button> 
+    <button type="button" onclick="AE.OpenApp(ReqPar7) " >反馈cookie</button> 
+	    <button type="button" onclick="AE.OpenApp(ReqPar4) " >header设置 </button> 
+		
+ 	</br>   刷新IE：   { "emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr":"AppJsObject.web.refresh();" }
+
+		   </div>
+             <div class="Appboxs" >
+			 
+			 <!--    textarea或者改为div  都可以,绑定嵌入APP的位置, AppEmbed 要一致。如果要跟随浏览器变化大小，设置相对%比例即可-->
+ 		     <div id="AppEmbed1"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:700px;height:520px" ></div>
+			 
+			                
+		</div>
+              <div style=" margin-left:1800px; margin-top:1800px;text-align:center ">
+			     测试滚动 
+		</div>  
+		<div   style="min-width:30px;min-height:700px;width:600px;height:700px" >
+ 	<div   style="min-width:30px;min-height:5px;width:600px;height:700px" >测试<a href="appemitWeb://?cid=00000-1&sid=1" id="aeweb">启动 appemit</a></div>
+
+</div>
+ 
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+<script>
+/*
+/////////////////////////////////////////////////////
+//步骤 
+1 在主页index.htmll load页面时加载AppEmit_1.2_min.js一次
+2 执行AE.InitApp一次
+3 使用vue或者直接多次使用AE.OpenApp来调用函数
+4 默认关闭网页自动 AE.OpenApp("emit":"close","AppId":1...) 【等效AE.CloseApp("AppId":1...)】
+////////////////////////////////////////////////
+ 
+Launched external handler for 
+ 
+*/
+
+ 
+ 
+   var close_App=function(){
+   
+      AE.OpenApp( {"emit":"close","Obj":"web","AppId":1});   //关闭Obj":"web","AppId":1的应用
+   }
+ 
+	var init_App=function(){ 
+        //步骤一 初始化
+		// AE.InitApp(document.getElementById('input_url').value);
+ 
+	  //或者采用回调	
+	   	  //反馈接口与AE.callbackFunc.equ相等后执行对应的函数，当websocket打开, 再执行AE.callbackFunc.func
+         AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":input_App} //连接websocket初始化成功后，执行input_App
+		                        ,{"equ": { "AppId": 1,"Obj": "web","rep": 0,"rid": 1,"AppStatus": 1 },"func":input_App2,inPar:{a:5}}  //,"neq": {data:null}
+					 
+								 //可以设置rid做标志(后面命令的rid延续前面的状态++1)，如果不方便打乱rid,在runCmd命令可以增加一个AppMark，唯一标识每一条命令的每一次执行。
+								 //还可以通过"neq"进一步判断//如果还不能区分，最好是重写appemit.min.js里面的 AE.InitApp中的websocket过程，处理Jdata
+								,{"equ": { "AppId": 1,"Obj": "web","rep": 0,"rid":"mark_rid1","AppMark":"独一的mark，非rid序列使用" },"neq": {data:null},"func":input_App3}  //,"neq": {data:null}
+                            ] ;
+            // AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1")
+			  AE.InitApp(document.getElementById("input_url").value)
+	}
+
+  
+	var input_App= function(Jdata){  //初始化后回调的数据 ,执行打开 App
+        console.log(111111111)
+		// 效果一样
+		//可以在360打开webpdf.html F12 看request请求字段
+	     //"par0":{"userAgent":navigator.userAgent   //推荐
+		//"par0":{"header": {"User-Agent":navigator.userAgent}}
+		 // 这样的cookieSet 多个记录 \r\n, \r, \n换行，默认"wait":2000毫秒等待网页尝试打开赋值cookieSet ，如果网页没有在wait秒内打开可能赋值不上。  推荐通过后面的AppJsObject.web.document.cookie="a=5;expires=..."一条一条赋值。 本地浏览器设置
+		 //"header": {"Cookie":"c2=5;dd=56","Accept-Language": "zh-CN,zh;q=0.9","Referer":"...." ,"Connection": "keep-alive"; 看实际情况，提交请求的字段
+	    // var  ReqPar=JSON.parse(document.getElementById("input_par").value);        
+		// "Set-Cookie":"a=55", 是服务器反馈的
+		    var ReqPar = [{ "emit": "open", "Obj": "web", "AppType": 1, "AppId": 1,"pos": 1,  "par": { "htmlStr": null,
+   // "HttpServer_startUrl": null, "URL": front_ip + "/static/templates/webPdf_G2.html?file="+ fileId + "&noteId="+noteId}, "par0":{"cookieSet": "userInfo="+userInfoC}};
+        "HttpServer_startUrl":  "/demo/htmlDemo/embed.html"}, "par0":{"userAgent":navigator.userAgent,"header": {"Cookie":"c2=5;dd=56","Accept-Language": "zh-CN,zh;q=0.9","Referer":"...."},
+	//	       "cookieSet":"u2=15; expires='Thu, 01 Jan 2022 00:00:00 GMT';\\ng2=7;\\nh2=8"  // \r\n, \r, \n换行  推荐使用AppJsObject.web.document.cookie设置。
+	     }} 
+	//	   "URL": "https://httpbin.org/anything"}  , "par0":{"header": {"cookie":"cid:'a=1;b=2'","Set-Cookie":"userInfo:'a=44;b=55;d=5;ff=5;ff=6'","User-Agent":navigator.userAgent}} }  
+	//   ,{"emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": ' return {cookie:AppJsObject.web.document.cookie,userAgent:AppJsObject.web.script.navigator.userAgent,header:AppJsObject.web.addHeaders}' }
+	  ,{"emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": ' /*AppJsFun.log(12312)*/;AppJsObject.web.document.cookie="b3=4;"; return AppJsObject.web.document.cookie;' }
+	//   ,{"emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": 'AppJsFun.inet.clearCookie();/*清空了所有cookie刚刚增加的函数老版本没有*/ return AppJsObject.web.document.cookie;' }  //清空cookie AppJsFun.inet.clearCookie 
+	];
+	   
+        //步骤二 执行
+		    AE.OpenApp(ReqPar);
+	   }
+	var input_App2= function(Jdata,inPar){  //APP打开后 回调的数据 
+        console.log(222,Jdata,inPar)
+		       
+       //AE.OpenApp({"emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": 'AppJsObject.web.document.cookie="newID=4"; return AppJsObject.web.document.cookie;' });
+	   }   
+	   
+	var input_App3= function(Jdata){  //  回调的数据 
+	
+        console.log(333)
+		   
+	   } 	   
+	   
+	   	   var input_do= function(){ 
+    AE.OpenApp(JSON.parse(document.getElementById("input_par").value))
+    }
+/**   
+* //////////////////////////////////demo 注册ReportX.ocx，再直接打开含有ReportX object的网页//////////////////////////////////////////////
+//使用"AppType":1IE内核打开ocx对象    "AppType":2 3webkit打开NPAPI对象
+优先级  html>inPar["HttpServer_startUrl"]>inPar["URL"]
+*/
+ 
+	
+/**	
+//"emit":"func" 单独的注册操作 ,未提交注册的文件，为了安全，限制为AppEmit文件夹下，不能注册或者注销其它文件夹下面的ocx dll
+*/
+ 
+// 设置获取header  "header":"c:5\r\nb:7"  ,启动web前后执行对应的命令
+ ReqPar4= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.baidu.com","header":{"c":5,"b":7}},"par0":{"AppStep":{"init":'var inet_whttp=AppJsFun.inet_whttp();inet_whttp.addHeaders="a:1\r\nb:4";/*{a=1;b=4};*/ ; inet_whttp.beginRequest("http://www.baidu.com/","GET"  );  inet_whttp.send(); 	var new_header = inet_whttp.readHeader() ; inet_whttp.endRequest(); return {new_header};', "destroy":null, "closed":null,"loaded":'AppJsFun.Sleep(8000);AppJsObject.web.go("http://news.baidu.com/");'}}}
+// 在AppStep init可以使用AppJsFun.inet.setCookie一条一条赋值cookie
+ ReqPar42= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.baidu.com ","User-Agent":navigator.userAgent},"par0":{"AppStep":{"init":'AppJsFun.inet.clearCookie("baidu.com"); AppJsFun.inet.setCookie("https://baidu.com", "43200", "temp5" );   AppJsFun.inet.setCookie("https://baidu.com", "2222", "temp6" );', "destroy":null, "closed":null,"loaded":'AppJsFun.Sleep(1000); return AppJsObject.web.document.cookie;'}}}
+ 
+
+
+ //或者更简单设置如下
+//在启动浏览器IE内核前，可以清除cookie "clearCookie":"baidu.com", (匹配，没有http), 然后可以设置cookie,必须有域名cookieDomain="http://baidu.com"，默认expires=7天，或者标准cookie时间格式。
+//inet_setCookie格式为a=1;b=1; c=1，默认以cookie_split="<; >|<;>"来分隔
+ ReqPar421= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.baidu.com"},"par0":{"clearCookie":"baidu.com","cookieDomain":"http://baidu.com","inet_setCookie":"a=5;b=6;c=7","AppStep":{"init":null,"loaded":"AppJsObject.web.waitDoc(); return AppJsObject.web.document.cookie"}}}
+
+
+//直接操作IE内核对象,首先打开网页生成对象AppJsObject.web，再使用AppJsObject.web直接调用
+ReqPar50= { "emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": 'AppJsObject.web.go("http://www.163.com")' };
+
+ 
+// 打开网页 后设置addheaders 后设置cookieSet赋值     
+ReqPar5= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":null,"htmlStr":null,"HttpServer_startUrl":"/demo/htmlDemo/embed.html" },"par0":{"header":{"a":"333"},"cookieSet":"a=3"}}
+//或者 直接设置document.cookie           AppJsObject.web.document.cookie="a=3;a=4;b=6"
+ ReqPar7= {"emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": ' AppJsObject.web.document.cookie="c=3";AppJsObject.web.document.cookie="b=6";return AppJsObject.web.document.cookie;' };
+
+
+//直接操作IE内核对象,执行js 赋值，   AppJsObject.web.doScript 或者 AppJsObject.web.eval,执行反馈
+//或者 AppJsObject.web.script能直接获取变量和方法
+/*
+   return  AppJsObject.web.script.funA();
+  return AppJsObject.web.script.var;
+*/
+var jscode1=`" var a=3;var c='c';var b=a+1;alert(b);var myadd=function(a,b){return a+b;}"`
+ 
+ ReqPar6= { "emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": ' AppJsObject.web.doScript('+jscode1+'); ++"  "++AppJsObject.web.script.c++"   "++AppJsObject.web.script.myadd(3,6);' }; 
+ 
+
+ //直接操作IE内核对象, Jquery 反馈 元素,支持Jquery  js  html css 操作 
+ //在Jquery中,用$("#id")来获得页面的input元素,其相当于document.getElementById("element") 但是,该获取的是一个Jquery对象,而不是一个dom element对象,加[0]
+ ReqPar8= { "emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": `;return AppJsObject.web.jQuery("#IDOpenPdf")[0].value;` };
+ 
+  //直接操作IE内核对象,   getEle反馈 元素,
+ ReqPar81= { "emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": `return {mark=1;  value=AppJsObject.web.getEle("IDOpenPdf").value};` };
+ 
+ 
+ 
+//直接操作IE内核对象,首先打开网页生成对象AppJsObject.web，操作元素
+//ReqPar9= { "emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": 'AppJsObject.web.getEle("IDrefresh3").click()' };
+ ReqPar9= { "emit": "runCmd", "Obj": "web", "AppId": 1, "rid":"mark_rid1","AppMark":"独一的mark，非rid序列使用","codeStr": `AppJsObject.web.doScript("var dir_cur='$[dir_Cur]';");return {"status"=1;"dir_cur"=AppJsObject.web.script.dir_cur}`,"par":{"strvar":1} };  
+
+
+ /**
+* //Js直接调用AppEmit 网页控件对象 变量external， 函数AppJsFun,或者其它设定的导出变量
+*下面的注释为执行代码
+*
+**/
+ 
+ function AE_txt2code(fn) {
+	 return fn.toString().split('\n').slice(1,-1).join('\n') + '\n'
+ }
+ //!@preserve 避免压缩代码时注释被取消，请验证  。script前修改为\ / 。  如果无法转为字符串代码，可用 `` 或者html文件引入，IE不支持·
+var embedHtmlStr = function() { /*!@preserve
+ 	 //这样注释转多行字符串的形式不支持script，需要修改。 即在运行代码前所有的script前的< \ /被替换为< /
+    <\/script>
+*/}
+
+// console.log(AE_txt2code(embedHtmlStr))
+ 
+ReqPar66= {"emit":"open","Obj":"web","AppType":2,"AppId":1,"pos":1,"par":{"htmlStr":AE_txt2code(embedHtmlStr)},"par0":{}} 
+
+ 
+ 
+
+// //高频次使用且不变的变量最好定义，避免一直实时访问appemit导出external.函数
+//非IE可以使用 "AppJsWeb":1  "AppJsObject":1 
+//"AppType":1 IE  2 webkit 3 blink   
+ 
+ /*
+网页内核的方法  ,在index.hrml通过AppJsObject.web来调用,在被导入的html 的js通过external调用
+ go(url);//  headers为追加  IE url,headers,target,flags ， kit bkink(url)
+ goBack()
+ goForward()
+ doScript(code,frame)  //IE(jscode,frame)   kit bkink(jscode)
+ post(url,postdata,headers,target,flags)  IE (url,postdata,headers,target,flags) ， kit blink(url,postdata)
+ refresh()   仅IE 刷新页面\n如果服务器未更新则不会重新下载,类似在浏览器中按F5的效果
+ refresh2(lev=0)     仅IE  重新下载页面\n可在参数中指定级别  Refresh20
+ refresh3(lev=3)   仅IE 重新下载最新页面\n添加Pragma:no-cache请求头,强制服务端刷新\n类似在浏览器中按下Ctrl+F5的效果    Refresh23
+ reload()   重新下载最新页面= refresh3
+ stop() 
+ document() 
+ script()
+ getDoc()  可以包含document以及iframe
+ click()
+
+ */
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,dll Ocx支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ <!-- <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script> -->
+ 
+   <style type="text/css">
+  .Appboxs {
+    margin-top:10px;
+     justify-content:space-around;
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex 
+    display: flex; 
+   display: box;
+  display: flexbox;
+
+}
+</style>  
+ 
+</head>
+
+<body >
+
+
+<div class="container">
+<input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+     <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button> &nbsp;  &nbsp; &nbsp;<a href="index.html" target="_blank">hardware Demo</a>&nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed </a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a> &nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp;  &nbsp; <a href="../login.html" target="_blank">Register</a> 
+      <div >  
+		<div style="font-size:10px">w1. webtype:   
+ 		 
+          <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.baidu.com","htmlStr":null,"HttpServer_startUrl":null  }}'/>
+	   
+		 <button type="button" id="btn_Flash" onclick="input_App() " >do it</button> &nbsp;  &nbsp; <button type="button" onclick="close_App() " >close</button> &nbsp;  &nbsp; <button type="button" id="btn_Flash" onclick="AE.OpenApp(ReqPar2)" >注册ocx网页打开</button>
+		  &nbsp;  &nbsp; <button type="button" id="btn_reg" onclick="AE.OpenApp(ReqPar3)" >单独注册ocx</button>
+		  &nbsp;  &nbsp; <button type="button" id="btn_reg" onclick="AE.OpenApp(ReqPar41)" >打开前设置cookie</button>
+		  <button type="button" id="btn_reg" onclick="AE.OpenApp(ReqPar4)" >执行追加函数</button>
+		 <button type="button" id="btn_reg" onclick="AE.OpenApp(ReqPar5)" >支持操作网页内核控件</button>
+ 	
+
+	   <button type="button" id="btn_reg" onclick="getbackData()" >反馈数据</button>
+	
+		</div>
+		<div style="font-size:10px">   <button type="button" id="btn_reg" onclick="IDCard()" >高拍仪</button>	</div>
+		<div style="font-size:10px">   <button type="button" id="btn_reg" onclick="barTender()" >barTender</button>	</div>
+		
+		
+ <div style="font-size:10px">flashOcx  IE    &nbsp;   &nbsp; {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://sxiao.4399.com/4399swf/upload_swf/ftp14/yzg/20140328/bombit7/zx_game7.htm","plugins":"flash_ocx"}}</div>      
+	<div style="font-size:10px">flashNP webkit    &nbsp;   &nbsp; {"emit":"open","Obj":"web","AppType":2,"AppId":1,"pos":1,"par":{"URL":"http://sxiao.4399.com/4399swf/upload_swf/ftp14/yzg/20140328/bombit7/zx_game7.htm","plugins":["flash_NP"]}}</div>      
+ 
+	 <div style="font-size:10px">close  :  {"emit":"close","Obj":"web","AppId":1}           &nbsp;  &nbsp; &nbsp;      or   &nbsp;   &nbsp; {"emit":"closeAll","Obj":"web"}</div>      
+	    <div style="font-size:10px">w1.  多个&nbsp; &nbsp;[{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"htmlStr":null,"HttpServer_startUrl":null,"URL":"http://www.baidu.com"},"par0":{"header":null,"noScriptErr":true,"UIFLAG":null,"DLCTL":null,"userAgent":null,"crossDomain":true,"rightMenu":-1,"show_UpdateTool":true}},{"emit":"open","Obj":"web","AppType":1,"AppId":2,"pos":1,"par":{"URL":"http://www.baidu.com"}}]</div>      
+ 
+
+
+ 
+ 	 
+		   </div>
+             <div class="Appboxs" >
+			 
+			 <!--    textarea或者改为div  都可以,绑定嵌入APP的位置, AppEmbed 要一致。如果要跟随浏览器变化大小，设置相对%比例即可-->
+ 		     <div id="AppEmbed1"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:600px;height:400px" ></div>
+			  <div id="AppEmbed2"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:300px;height:300px" ></div>
+			   <div id="AppEmbed3"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:30px;height:30px" ></div>
+			                
+		</div>
+              <div style=" margin-left:3800px; margin-top:3800px;text-align:center ">
+			     测试滚动 
+		</div>  
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+<script>
+
+ 
+
+/**
+/////////////////////////////////////////////////////
+//步骤 
+1 在主页index.htmll load页面时加载AppEmit_1.2_min.js一次
+2 执行AE.InitApp一次
+3 使用vue或者直接多次使用AE.OpenApp来调用函数
+4 默认关闭网页自动 AE.OpenApp("emit":"close","AppId":1...) 【等效AE.CloseApp("AppId":1...)】
+
+注意 对于IE有些加载了pdf 的文档遇到缓存，默认加了一个noRefresh:false
+如果是单页面，不显示，可以设置noRefresh:true
+ 
+ 高级注册用户可以设置
+ par0:"enableInternetRunActiveX":1 ，开启本用户的IE注册表security zones设置，允许internet运行activex。HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3\1200  设为0
+ par0:"ZoneMapDomains":[aaa.com,bbb.com] ,增加受信任站点，使用https网络，HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\aaa.com\www   https设为 2
+ 
+如果需要安装使用IE11，设置参数 par0:"IE11":1 ,会自动下载安装IE11。 windows 有IE内核，不要浏览器是可以的。
+版本类型和下载地址如下
+				if( lcid == 0x804 ){
+					url = "http://download.microsoft.com/download/F/2/8/F2871AC4-E82B-4636-BB37-A5F2B14C8616/IE11-Windows6.1-x86-zh-cn.exe"
+					if(_WIN_64){
+						url = "http://download.microsoft.com/download/5/6/F/56FD6253-CB53-4E38-94C6-74367DA2AB34/IE11-Windows6.1-x64-zh-cn.exe"
+ 
+				elseif( lcid == 0xC04 ){
+					url = "http://download.microsoft.com/download/7/8/8/788B10AB-C1D7-4DA9-BADF-2A939D769A43/IE11-Windows6.1-x86-zh-hk.exe"
+					if(_WIN_64){
+						url = "http://download.microsoft.com/download/5/1/C/51C47611-49D2-4791-B2DE-6DE0965B8ACC/IE11-Windows6.1-x64-zh-hk.exe"
+			 
+				elseif( lcid == 0x404 ){
+					url = "http://download.microsoft.com/download/6/C/3/6C373F0D-F076-4947-93E5-DE787D45F695/IE11-Windows6.1-x86-zh-tw.exe"
+					if(_WIN_64){
+						url = "http://download.microsoft.com/download/2/9/6/2966291B-B5D3-4D57-842E-8DD2F1AB0BA1/IE11-Windows6.1-x64-zh-tw.exe"
+             else
+					url = "http://download.microsoft.com/download/9/2/F/92FC119C-3BCD-476C-B425-038A39625558/IE11-Windows6.1-x86-en-us.exe"
+					if(_WIN_64){
+						url = "http://download.microsoft.com/download/7/1/7/7179A150-F2D2-4502-9D70-4B59EA148EAA/IE11-Windows6.1-x64-en-us.exe"
+////////////////////////////////////////////////
+*/
+   var close_App=function(){
+   
+      AE.OpenApp( {"emit":"close","Obj":"web","AppId":1});   //关闭Obj":"web","AppId":1的应用
+   }
+ 
+	var init_App=function(){ 
+        //步骤一 初始化
+		 
+				AE.InitApp(document.getElementById('input_url').value);
+       
+	  //或者采用回调	
+	//  	  //反馈接口与AE.callbackFunc.equ相等后执行对应的函数，当websocket打开, 再执行AE.callbackFunc.func
+    //      AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":input_App} //连接websocket成功后，执行input_App
+    //                                     ] ;
+     //       AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1")
+	}
+	   
+   
+	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+        //步骤二 执行
+		    AE.OpenApp(ReqPar);
+			
+	   }
+
+
+  //setTimeout(input_App,3000)
+	   
+	   
+	   
+/**   
+* //////////////////////////////////demo 注册ReportX.ocx，再直接打开含有ReportX object的网页//////////////////////////////////////////////
+//使用"AppType":1IE内核打开ocx对象    "AppType":2 3webkit打开NPAPI对象
+优先级  html>inPar["HttpServer_startUrl"]>inPar["URL"]
+*/
+//AE.txt2code功能有限，不能加js代码  还可以使用URL或者HttpServer_startUrl输入
+			var htmlStr=AE.txt2code(function(){/*!@preserve
+			   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+			 <div>
+				 reportX ，需要注册才能使用。<input type="button" id="btn1" name="btn1" value="调用ocx"  onclick="ReportX1.OpenReport('demo/htmlDemo/file/rep1.rpxe')"></input>
+				  <OBJECT ID='ReportX1' CLASSID='CLSID:A5DA6E97-1D4C-4708-B705-84A45716B4DD' >
+					<PARAM NAME="Visible" VALUE="1">
+				  <PARAM NAME="AutoScroll" VALUE="1">
+				  <PARAM NAME="AutoSize" VALUE="1">
+				  </OBJECT>
+				</div>
+			*/});
+ 
+            //未提交注册的文件，为了安全，限制为AppEmit文件夹，不能注册或者注销其它文件夹下面的ocx dll,其中 pid唯一
+		 	 ReqPar2= {"emit":"open","Obj":"web","AppType":1,"pos":1,"AppId":1
+			  ,"par":{"URL":null,"htmlStr":htmlStr,"HttpServer_startUrl":null                                         //"HttpServer_startUrl":"/demo/htmlDemo/ocx.html"   //使用本地html
+			   ,"embed_object" : {                                     //多个object可以设置embed_object为数组 
+								   "objName":"ReportX1"    
+								  ,"pid":"ReportX"   //使用公共插件  pid 名称，  pid 名称是AE共有的，则调用共有的插件                       
+								    ,"reg":true    //null 不执行注册   1强制操作 true 未注册则注册  false 卸载注册 (重启AppEmit后，就不能加载dll了)  
+									,"asAdmin":0   //1需要管理员权限注册 0不需要 ,win7管理员身份会有提示确认窗口
+								                   //等ReportX.ocx下载下来可以拷贝到下面的私有目录测试
+								    //  ,"pid":"292A53CD-DA8F-46A5-808D-B286F2759C37" //使用私有插件,则需要增加下列信息 如果dll/ocx文件改变了，需要更新appemit登陆窗口中我的应用里面的sha1值
+								 	,"dllFile":"/plugins/private/292A53CD-DA8F-46A5-808D-B286F2759C37/ReportX.ocx"      //为了安全，限制为AppEmit文件夹，不能注册或者注销其它文件夹下面的ocx
+								   ,"CLASSES_ROOT":"HKEY_CLASSES_ROOT\\ReportProj1.ReportX\\CLSID"   //可选，reg= true检查是否已经注册,一定要是\\分隔
+								   ,"clsId":"A5DA6E97-1D4C-4708-B705-84A45716B4DD"                           // 可选，reg= true检查是否已经注册
+								   ,"AuthKey":"A1-ZneY-2qGoXRfc7h6GZZxBB2gceORBwyhoxsA6GK5agLtIAwLhh6BnK61W8fORVNv"  								  
+								 } 
+				   }
+			   } ;  
+	////////////////////////////////////////////////////////////////////////////
+ 
+
+	
+/**	
+//"emit":"func" 单独的注册操作 ,未提交注册的文件，为了安全，限制为AppEmit文件夹下，不能注册或者注销其它文件夹下面的ocx dll
+*/
+ //[pid,reg,asAdmin,dllFile,CLASSES_ROOT,clsId,AuthKey]
+   //共有的库 pid唯一
+ var  regPar0={"pid":"ReportX","reg":true, "asAdmin":0,"dllFile":null 
+ ,"CLASSES_ROOT":"HKEY_CLASSES_ROOT\\ReportProj1.ReportX\\CLSID" ,"clsId":"A5DA6E97-1D4C-4708-B705-84A45716B4DD" ,"AuthKey":null};
+//私有的库 pid唯一,如果dll/ocx文件改变了，需要更新appemit登陆窗口中我的应用里面的sha1值
+var  regPar={"pid": "292A53CD-DA8F-46A5-808D-B286F2759C37"       //pid 名称，如果  pid 名称是AE共有的，则调用共有的插件
+ 				  ,"reg":true   // "reg" null 不执行注册   1强制操作 true 未注册则注册  false 卸载注册 (重启AppEmit后，就不能加载dll了)  
+ 			      ,"asAdmin":0  //"asAdmin"    //1需要管理员权限注册 0不需要 win7管理员身份会有提示确认窗口
+	              ,"dllFile":"/plugins/private/292A53CD-DA8F-46A5-808D-B286F2759C37/ReportX.ocx"  //"dllFile"  // ,"d:/report/ReportX.ocx"   //"dllFile
+ 				  ,"CLASSES_ROOT":"HKEY_CLASSES_ROOT\\ReportProj1.ReportX\\CLSID"    //"CLASSES_ROOT"  可选，reg= true检查是否已经注册,一定要是\\分隔
+ 				  ,"clsId":"A5DA6E97-1D4C-4708-B705-84A45716B4DD"                           // "clsId"  可选，reg= true检查是否已经注册
+				 ,"AuthKey":"A1-ZneY-2qGoXRfc7h6GZZxBB2gceORBwyhoxsA6GK5agLtIAwLhh6BnK61W8fORVNv"   // private目录则需要校验,若网站设置了sha1则还会校验sha1
+                 };
+  ReqPar3= {"emit":"func","Obj":"regsvr32","par":regPar};
+  
+//定节点执行命令	,举例设置获取header  "header":"c:5\r\nb:7"
+ReqPar4= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.baidu.com","header":{"c":5,"b":7}},"par0":{"AppStep":{"init":'var inet_whttp=AppJsFun.inet_whttp();inet_whttp.addHeaders="a:1\r\nb:4";/*{a=1;b=4};*/ ; inet_whttp.beginRequest("http://www.qq.com/","GET"  );  inet_whttp.send(); 	var new_header = inet_whttp.readHeader() ; inet_whttp.endRequest();return {new_header};', "destroy":null, "closed":null,"loaded":'AppJsFun.Sleep(8000);AppJsObject.web.go("http://news.baidu.com/");'}}}
+
+ReqPar41= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://local.a.com ","User-Agent":navigator.userAgent},"par0":{"AppStep":{"init":'AppJsFun.inet.setCookie("https://local.a.com", "43200", "temp6" );  AppJsFun.inet.setCookie("https://local.a.com", "2222", "temp6" );', "destroy":null, "closed":null,"loaded":'AppJsFun.Sleep(1000); return AppJsObject.web.document.cookie;'}}}
+ 
+
+//直接操作IE内核对象,首先打开网页生成对象AppJsObject.web，再使用AppJsObject.web直接调用
+ReqPar5= { "emit": "runCmd", "Obj": "web", "AppId": 1, "codeStr": 'AppJsObject.web.go("http://www.163.com")' };
+ 
+
+ /**
+* //Js直接调用AppEmit 网页控件对象 变量external， 函数AppJsFun,或者其它设定的导出变量
+*下面的注释为执行代码
+*
+**/
+ 
+ function AE_txt2code(fn) {
+	 return fn.toString().split('\n').slice(1,-1).join('\n') + '\n'
+ }
+ //!@preserve 避免压缩代码时注释被取消，请验证  。script前修改为\ / 。  如果无法转为字符串代码，可用 `` 或者html文件引入，IE不支持·
+var embedHtmlStr = function(){/*!@preserve
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <div onmousedown='javascript:  
+        external.hitCaption();
+        return false;
+    ' style="-webkit-user-select: none;cursor:default;background:#cce;padding:25px;margin:10px;">拖动窗口</div>
+	<a href='javascript:   external.go("http://www.baidu.com"); '>1.1  js调用appemit的网页控件接口external打开baidu</a></p>
+	<a href='javascript: myAppJsFun.msgbox("33","title");   '>1.2  js调用appemit的通用函数库AppJsFun的msgbox窗口</a></p>
+	<a href='javascript: external.script().jsFun_a(322) '>2 appemit 通过 external.script调用导入的js文件中的函数,只能实时</a></p>
+ 	<a href='javascript: AppJsFun.msgbox("webkit blink可以全局函数","title");  '>3 AppType=2 webkit和3 blink接口函数  </a></p>
+ 
+	
+    <script>
+	 //高频次使用且不变的变量最好定义，避免一直实时访问appemit导出external.AppJsFun  
+     var  myAppJsFun=external.AppJsFun;  //wekit或者blink可以不要"external."
+	 var jsFun_a=function(a){ alert(a+123); }
+	 //这样注释转多行字符串的形式不支持script，需要修改。 即在运行代码前所有的script前的< \ /被替换为< /
+    <\/script>
+*/}
+
+// console.log(AE_txt2code(embedHtmlStr))
+ 
+ReqPar6= {"emit":"open","Obj":"web","AppType":2,"AppId":1,"pos":1,"par":{"htmlStr":AE_txt2code(embedHtmlStr)},"par0":{}} 
+
+ 
+
+
+// //高频次使用且不变的变量最好定义，避免一直实时访问appemit导出external.函数
+//非IE可以使用 "AppJsWeb":1  "AppJsObject":1 
+//"AppType":1 IE  2 webkit 3 blink   
+ /*
+网页内核的方法  ,通过external 调用
+ go(url);//  headers为追加  IE url,headers,target,flags ， kit bkink(url)
+ goBack()
+ goForward()
+ doScript(code,frame)  //IE(jscode,frame)   kit bkink(jscode)
+ post(url,postdata,headers,target,flags)  IE (url,postdata,headers,target,flags) ， kit blink(url,postdata)
+ refresh()   仅IE 刷新页面\n如果服务器未更新则不会重新下载,类似在浏览器中按F5的效果
+ refresh2(lev=0)     仅IE  重新下载页面\n可在参数中指定级别  Refresh20
+ refresh3(lev=3)   仅IE 重新下载最新页面\n添加Pragma:no-cache请求头,强制服务端刷新\n类似在浏览器中按下Ctrl+F5的效果    Refresh23
+ reload()   重新下载最新页面= refresh3
+ stop() 
+ document() 
+ script()
+ getDoc()  可以包含document以及iframe
+ click()
+
+ */
+ 
+ //del
+ 
+ htmlStr5=AE.txt2code( function(){/*!@preserve
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<p><a href='javascript:backdata()'>主动反馈数据</a></p>
+ 
+    <script>
+	backdata=function(){
+	      external.emitBack('{"a":444}');
+	     external.runCmd("return {'temp':333}")  //,"cookieStr":external.web.cookieStr()
+	    }
+          
+    <\/script>
+*/})
+ 
+ 
+ 
+ getbackData=function(){
+ 
+ 		 	var  ReqPar5= {"emit":"open","Obj":"web","AppType":1,"pos":1,"AppId":1
+			     ,"par":{"URL":null,"htmlStr":htmlStr5,"HttpServer_startUrl":null }
+	 
+			   } ;  
+ 
+    AE.OpenApp(ReqPar5);
+ 
+ }
+	   
+ 	//////高拍仪
+	function  IDCard(){
+				var htmlStr7=AE.txt2code(function(){/*!@preserve
+			   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+			 <div>
+				高拍仪，需要注册才能使用。<input type="button" id="btn1" name="btn1" value="调用ocx"  onclick="GetVersionInfo()"></input>
+                <OBJECT style="float:right" classid="clsid:10EC554B-357B-4188-9E5E-AC5039454D8B" id="objIDCard" width="300" height="200"></OBJECT>
+
+				</div>
+	  <script>
+	  function GetVersionInfo(){
+	    alert(objIDCard.objIDCard.GetVersionInfo())
+	  
+	  }
+	 
+	 //这样注释转多行字符串的形式不支持script，需要修改。 即在运行代码前所有的script前的< \ /被替换为< /
+    <\/script>
+				
+			*/});
+ 
+            //未提交注册的文件，为了安全，限制为AppEmit文件夹，不能注册或者注销其它文件夹下面的ocx dll,其中 pid唯一
+		 	 ReqPar7= {"emit":"open","Obj":"web","AppType":1,"pos":1,"AppId":1
+			  ,"par":{"URL":'/index.htm',"htmlStr":null,"HttpServer_startUrl":null                                         //"HttpServer_startUrl":"/demo/htmlDemo/ocx.html"   //使用本地html
+			   ,"embed_object" : {                                     //多个object可以设置embed_object为数组 
+								   "objName":"objIDCard"    
+							    ,"reg":true    //null 不执行注册   1强制操作 true 未注册则注册  false 卸载注册 (重启AppEmit后，就不能加载dll了)  
+								 	,"asAdmin":0   //1需要管理员权限注册 0不需要 ,win7管理员身份会有提示确认窗口
+								    //  ,"pid":"292A53CD-DA8F-46A5-808D-B286F2759C37" //使用私有插件,则需要增加下列信息 如果dll/ocx文件改变了，需要更新appemit登陆窗口中我的应用里面的sha1值
+								 ,"dllFile":"/MT8ActiveX.ocx"      //为了安全，限制为AppEmit文件夹，不能注册或者注销其它文件夹下面的ocx
+								   ,"CLASSES_ROOT":"HKEY_CLASSES_ROOT\\真实的ReportProj1.ReportX\\CLSID"   //可选，reg= true检查是否已经注册,一定要是\\分隔
+								   ,"clsId":"10EC554B-357B-4188-9E5E-AC5039454D8B"                           // 可选，reg= true检查是否已经注册
+								//   ,"AuthKey":"A1-ZneY-2qGoXRfc7h6GZZxBB2gceORBwyhoxsA6GK5agLtIAwLhh6BnK61W8fORVNv"  								  
+								 } 
+				   }
+			   } ;  
+	 AE.OpenApp(ReqPar7);
+}	
+	
+/////////////////////////
+  	//   barTender
+	function barTender(){
+				var htmlStr8=AE.txt2code(function(){/*!@preserve
+			   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+			 <div>
+				barTender <input type="button" id="btn1" name="btn1" value=" 111"  onclick="hwnd()"></input>
+                <OBJECT style="float:right" classid="clsid:B9425246-4131-11D2-BE48-004005A04EDF" id="BarTender" width="300" height="200"></OBJECT>
+
+				</div>
+	  <script>
+	  function hwnd(){
+	    alert(100)
+		   bt=new BarTender.Application();
+		    alert(120)
+	  
+	  }
+	 
+	 //这样注释转多行字符串的形式不支持script，需要修改。 即在运行代码前所有的script前的< \ /被替换为< /
+    <\/script>
+				
+			*/});
+ 
+            //未提交注册的文件，为了安全，限制为AppEmit文件夹，不能注册或者注销其它文件夹下面的ocx dll,其中 pid唯一
+		 	 ReqPar8= {"emit":"open","Obj":"web","AppType":1,"pos":1,"AppId":1
+			  ,"par":{"URL":null,"htmlStr":htmlStr8,"HttpServer_startUrl":null                                         //"HttpServer_startUrl":"/demo/htmlDemo/ocx.html"   //使用本地html
+			 /**  ,"embed_object" : {                                     //多个object可以设置embed_object为数组 
+								   "objName":"barTender"    
+							     ,"reg":null    //null 不执行注册   1强制操作 true 未注册则注册  false 卸载注册 (重启AppEmit后，就不能加载dll了)  
+								 	,"asAdmin":0   //1需要管理员权限注册 0不需要 ,win7管理员身份会有提示确认窗口
+								    //  ,"pid":"292A53CD-DA8F-46A5-808D-B286F2759C37" //使用私有插件,则需要增加下列信息 如果dll/ocx文件改变了，需要更新appemit登陆窗口中我的应用里面的sha1值
+								// ,"dllFile":"/plugins/private/292A53CD-DA8F-46A5-808D-B286F2759C37/具体地址.ocx"      //为了安全，限制为AppEmit文件夹，不能注册或者注销其它文件夹下面的ocx
+								   ,"CLASSES_ROOT":"HKEY_CLASSES_ROOT\\真实的ReportProj1.ReportX\\CLSID"   //可选，reg= true检查是否已经注册,一定要是\\分隔
+								   ,"clsId":"10EC554B-357B-4188-9E5E-AC5039454D8B"                           // 可选，reg= true检查是否已经注册
+								//   ,"AuthKey":"A1-ZneY-2qGoXRfc7h6GZZxBB2gceORBwyhoxsA6GK5agLtIAwLhh6BnK61W8fORVNv"  								  
+								 } 
+								 */
+				   }
+			   } ;  
+	 AE.OpenApp(ReqPar8);
+}	
+ 
+</script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 登陆</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+ 
+</head>
+<body>
+
+
+<div class="container">
+       <div >  
+		<div style="font-size:10px"> <a  style="font-size:120%; color:white; " href="http://www.appemit.com/"  target="_blank"><img border="0" src="https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb/docs/img/logo.png" /></a> </div>
+  
+		   </div>
+             <div style="margin-top:10px;text-align:center">
+				<textarea readonly id="AppEmbed1"  style="border:none;min-width:30px;min-height:20px;width:850px;height:560px" ></textarea>
+		</div>
+ 
+</div>
+
+
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="htmlDemo/AppEmit_1.2_min.js"></script>  
+<script>
+ 
+ 
+     AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth": 1}
+	                                      ,"func":function(){ AE.OpenApp(  {"emit":"open" ,"Obj":"webLogin" ,"AppType":0,"pos":1}) }
+	                                        } 
+                                   ] ;
+								   
+ 
+ 	 AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1")   //连接websocket成功后，执行input_App
+  
+ 
+</script>
+</body>
+</html>

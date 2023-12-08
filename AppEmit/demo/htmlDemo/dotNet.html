@@ -1,0 +1,308 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit dll ocx ActiveX</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ <!--  <script src="https://cdn.jsdelivr.net/npm/js-base64@3.2.4/base64.min.js"></script>  -->
+ 
+      <style type="text/css">
+        html,body{
+            height: 100%;
+	      width:100%
+        }
+    body{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+     <div style="font-size:10px"> 2.可视化com组件 
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='  '/>
+		   	<button type="button" id="btn_Flash" onclick="start_App() " >do it</button> &nbsp; &nbsp;<a href="index.html" target="_blank">index</a> &nbsp; &nbsp;<a href="web.html" target="_blank">web</a><a href="AppEmbed.html" target="_blank">AppEmbed </a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a> &nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;
+		   </div>  
+  	
+ 
+	 <div >	  
+ 
+	 <button type="button" id="btn_runCmd" onclick="AE.OpenApp(Req1)" >net 调用system</button>    
+	  	 <button type="button" id="btn_runCmd" onclick="callDll2()" >  自行开发net</button>     
+		 	  	 <button type="button" id="btn_runCmd" onclick="callCom1()" > 调用com</button>   
+  	 <button type="button" id="btn_runCmd" onclick="ComcreateEmbedEx1()" > 嵌入com</button>   
+
+				 
+    </div >     
+ <div readonly id="AppEmbed1"  style="border:none; 	width:100%;height:100%" ></textarea>
+	 
+  
+
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+/**步骤
+ // 1. AE.InitApp  连接ws
+ // 2.AE.OpenApp  打开app dll
+  //3. AE.OpenApp  调用发送命令
+  //4. 结束时一定需要正常退出,调用 的dll需要 stop或者null或者销毁
+**/
+ 
+ 
+	  var  reportXPath;
+	  
+	  var init_mark=  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");  //flag=1 调试环境
+	 
+ 	//office
+	var start_App= function(){
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+		  
+ 		//   ReqPar={"emit":"open","Obj":"flash","src":"D:/work/temp/m1.swf","pos":1,"par0":{"autoPlay":1,"toolbar":0,"rightMenu":0,"hitCaption":0,"hideStop":0,"loop":1,"volumeMute":0}}
+	
+	   	   AE.OpenApp(ReqPar);
+		    
+	    
+	   }
+	   
+ //  OpenApp  (Req,interval,sync)  
+//  OpenApp  (Req,5,false)   异步 5毫秒执行，命令组时，可能会出现后续命令先执行，但依赖前面变量报错的情况。
+// 可以采用等待20毫秒，同步执行 OpenApp  (Req,20,true) 
+//dotNet   AppJsFun.dotNet
+//调用系统 System.dll 
+//程序集 AppJsLibrary.objName   类 AppJsClass.objName   对象AppJsObject.objName 访问
+///////////dotNet //////////////
+var Req1= [{"emit":"open","Obj":"dll","AppId": 1,"src":[  {                       //,  私有的必需,在appemit登录窗口，我的应用，插件中设置sha1 pid  AuthKey等数据
+	 							     createType:"dotNet"                //   dotNet    //应用程序域,  //可视化的控件 createEmbedEx    createEmbed(comCarrier,clsId,iid)  , createObject(clsId,iid)   createInstance(clsId,itface)   createUnknown(clsId,iid) 
+									// ,clr :"v4.0"                       //默认  "v4.0"  ||  "v2.0" , 不指定参数可以自动选择合适的版本,\n注意 .NET 3.5的运行时是v2.0,.Net 4.5的运行时是v4.0\nWIN7自带.NET2.0运行时,WIN10自带.NET4.0运行时
+									 ,objName:"sysAsmObj"              //自行定义   
+								 	// ,comCarrier:"custom"           // createEmbed可视化  picture(图片控件设置)、static 、winform  默认 推荐 custom           //不同类型组件采取不要载体
+									 ,dllFile:"System"                //程序集或者Dll文件 AppJsLibrary.sysAsmObj
+									 ,loadType:"load"                //load 加载系统含有的 loadFile本地路径/ 分隔，loadFile失败尝试 loadAppData
+								    ,space_class:"System"           //可填    //import导入程序集中的名字空间或类 AppJsClass.sysAsmObj
+									,instancePar:null         //可填 new实例对象参数 AppJsObject.sysAsmObj
+ 							 		// ,pid:"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"
+								   // ,AuthKey:"A1-rbJouaNIsm-NwndUCunpnRW8GYw-72Sp7XbDjiSQ2MuXtEaFyrs1c4nTBrqXHrKu"                //pid的授权，appemit网站获取
+									//,clsId :"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"  //guid  自己自行生成的， 最好和pid不同。 dll  里面设置的一致	
+                                  //  ,CLASSES_ROOT:null        //自行开发dll不用注册，则不用设置
+ 								    ,ver:"1.0.0"  
+								//	,iid:null  
+								// ,data:'{"msg":"init from JS2","info":12}'               //发送给dll  数据
+									
+								   }    
+						    ]
+						 ,"AppShow":false                  //整体不可见 必须设置，默认可见   
+						 // 反馈程序集名称  
+						 ,"par":{"webJs":0},"par0":{"AppStep":{"init":"return {'step':'init'}", "loaded": 'return {FullName:AppJsLibrary.sysAsmObj.FullName };', "destroy":null, "closed":null}, "AppMethod":"msg Synchronization component need set: POST" }
+						 }
+						 //再反馈程序集路径 "C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System\v4.0_4.0.0.0__b77a5c561934e089\System.dll"
+                , { "emit":"runCmd","Obj":"dll", "AppId": 1, "codeStr": 'return {Location: AppJsLibrary.sysAsmObj.Location}'   }
+				//调用类的静态成员函数,也可以这样读写类的其他静态成员属性
+               , { "emit":"runCmd","Obj":"dll", "AppId": 1, "codeStr": 'return {CheckHostName: AppJsClass.sysAsmObj.Uri.CheckHostName("www.appemit.com")}'   }
+			   //用 System 名字空间下面的类构造对象实例，官方建议规范：对象实例建议首字符小写
+			   , { "emit":"runCmd","Obj":"dll", "AppId": 1, "codeStr": 'var uri = AppJsClass.sysAsmObj.Uri("https://www.appemit.com/test?q=AAA"); return {"uri":{uri.Host;uri.GetHashCode();tostring(uri)}}'   }
+ 		
+           ]				
+ 
+
+///////////调用dotNet  dll文件 CSNET2ClassLibrary ////////////////
+function callDll2(){
+var Req2= [{"emit":"open","Obj":"dll","AppId": 1,"src":[  {                       //,  私有的必需,在appemit登录窗口，我的应用，插件中设置sha1 pid  AuthKey等数据
+ 								//   "asAdmin":0   //1需要管理员权限注册 0不需要
+								//	,"reg":null    //使用appemit直接调用，一般可以不注册。null 不注册   true 注册 false 卸载注册    
+								     createType:"dotNet"                //   dotNet    //应用程序域  //可视化的控件 createEmbedEx    createEmbed(comCarrier,clsId,iid)  , createObject(clsId,iid)   createInstance(clsId,itface)   createUnknown(clsId,iid) 
+									// ,clr :"v4.0"                       //默认  "v4.0"  ||  "v2.0" , 不指定参数可以自动选择合适的版本,\n注意 .NET 3.5的运行时是v2.0,.Net 4.5的运行时是v4.0\nWIN7自带.NET2.0运行时,WIN10自带.NET4.0运行时
+									 ,objName:"csTest1"              //自行定义   
+									// ,comCarrier:"custom"           // createEmbed可视化  picture(图片控件设置)、static 、winform  默认 推荐 custom           //不同类型组件采取不要载体
+									 ,loadType:"loadFile"                //load 加载系统含有的 loadFile本地路径/ 分隔，loadFile失败尝试 loadAppData
+ 					                ,dllFile:"/plugins/private/50FCF891-1B93-4AE5-8A66-AB26A3C03378/CSNET2ClassLibrary.dll"     //  必须 \\   / 分隔, 程序集或者Dll文件 AppJsLibrary.sysAsmObj ,个人的插件放在/plugins/private/clsId/文件夹下面
+								    ,space_class:"CSNET2ClassLibrary"           //可填    //import导入程序集中的名字空间或类 AppJsClass.csTest1
+									,instancePar:null         //可填 new实例对象参数 AppJsObject.csTest1
+ 								   ,pid:"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"
+								 	,AuthKey:"A1-rbJouaNIsm-NwndUCunpnRW8GYw-72Sp7XbDjiSQ2MuXtEaFyrs1c4nTBrqXHrKu"                //pid的授权，appemit网站获取
+									//,clsId :"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"  //guid  自己自行生成的， 最好和pid不同。 dll  里面设置的一致	
+                                  //  ,CLASSES_ROOT:null        //自行开发dll不用注册，则不用设置
+ 								    ,ver:"1.0.0"  
+								//	,iid:null  
+								// ,data:'{"msg":"init from JS2","info":12}'               //发送给dll  数据
+									
+								   }    
+						    ]
+						 ,"AppShow":false                  //整体不可见 必须设置，默认可见   
+					
+						 ,"par":{"webJs":0},"par0":{"AppStep":{"init":"return {'step':'init'}", "loaded": null, "destroy":null, "closed":null}, "AppMethod":"msg Synchronization component need set: POST" }
+						 }
+			  	 // 实例化，修改对象属性反馈
+				   , { "emit":"runCmd","Obj":"dll", "AppId": 1, "codeStr": 'AppJsObject.csTest1 = AppJsClass.csTest1.CSSimpleObject(); AppJsObject.csTest1 .FloatProperty = 936; return {FloatProperty2:AppJsObject.csTest1.FloatProperty};'   }
+
+              //调用对象的静态方法 也可以通过类调用静态方法,效果 是一样的
+			    , { "emit":"runCmd","Obj":"dll", "AppId": 1, "codeStr": 'return { "HelloWorld_len"=AppJsObject.csTest1.GetStringLength("HelloWorld");"HelloWorld_len2"=AppJsClass.csTest1.CSSimpleObject.GetStringLength("HelloWorld")} '   }
+ 
+		 ] 
+ 
+		// 命令组的时候，可以采用等待10毫秒，同步执行 OpenApp  (Req,20,true) ,否则可能会报错, 这个函数比推荐使用 loaded比较慢
+        AE.OpenApp(Req2,10,true);
+
+		
+		   
+/****
+\CSNET2ClassLibrary.dll 的 C#源码如下：
+
+namespace CSNET2ClassLibrary
+{
+    using System;
+    using System.Runtime.InteropServices;
+
+    [ComVisible(true), ClassInterface(ClassInterfaceType.AutoDual), IDispatchImpl(IDispatchImplType.InternalImpl)]
+    public class CSSimpleObject
+    {
+        private float fField = 13456.78f;
+
+        public static int GetStringLength(string str)
+        {
+            return str.Length;
+        }
+
+        public float FloatProperty
+        {
+            get
+            {
+                return this.fField;
+            }
+            set
+            {
+                this.fField = value;
+            }
+        }
+    }
+}
+
+****/ 
+
+}
+
+
+//com  下面为调用系统不需要指定dll的情况。更多可以参考 dll.html的通用的dll 调用
+/**
+createEmbedEx ： 嵌入对象
+ createObject(clsId,iid) ：  创建对象
+ queryObjectR ：   c++ ，查询 IDispatch 接口、并创建 com.IDispatch 对象\n如果成功则调用 com.Release 释放传入的 IUnknown 指针\n使其引用计数减一,释放的指针不应再使用,\n返回的 COM 对象会增加引用计数,\n并在对象释放时自动减一
+ getObject： 获取对象
+*/
+
+var callCom1=function (){
+//调用 Connection
+var Req3= [{"emit":"open","Obj":"dll","AppId": 1,"src":[  {                       //,  私有的必需,在appemit登录窗口，我的应用，插件中设置sha1 pid  AuthKey等数据
+ 								//   "asAdmin":0   //1需要管理员权限注册 0不需要
+								//	,"reg":null    //使用appemit直接调用，一般可以不注册。null 不注册   true 注册 false 卸载注册
+                                      ComDll:"Com"							 //com组件,不写默认为dll 
+								    , createType:"createObject"                //     createEmbedEx , createObject(clsId,iid)  ,   queryObjectR,  getObject
+ 									 ,objName:"comTest1"              //自行定义   
+									// ,comCarrier:"custom"           // createEmbed可视化  picture(图片控件设置)、static 、winform  默认 推荐 custom           //不同类型组件采取不要载体
+  					              //  ,dllFile:"/plugins/private/50FCF891-1B93-4AE5-8A66-AB26A3C03378/CSNET2ClassLibrary.dll"     //  必须 \\   / 分隔, 程序集或者Dll文件 AppJsLibrary.sysAsmObj ,个人的插件放在/plugins/private/clsId/文件夹下面
+  								//   ,pid:"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"
+								// 	,AuthKey:"A1-rbJouaNIsm-NwndUCunpnRW8GYw-72Sp7XbDjiSQ2MuXtEaFyrs1c4nTBrqXHrKu"                //pid的授权，appemit网站获取
+									 ,clsId :"ADODB.Connection"   //"Scripting.FileSystemObject"
+                                  //  ,CLASSES_ROOT:null        //自行开发dll不用注册，则不用设置
+ 								    ,ver:"1.0.0"  
+								//	,iid:null  
+								// ,data:'{"msg":"init from JS2","info":12}'               //发送给dll  数据
+									
+								   }    
+						    ]
+						 ,"AppShow":false                  //整体不可见 必须设置，默认可见   
+					
+						 ,"par":{"webJs":0},"par0":{"AppStep":{"init":null, "loaded": null, "destroy":null, "closed":null}, "AppMethod":"msg Synchronization component need set: POST" }
+						 }
+			  	  //返回
+				 , { "emit":"runCmd","Obj":"dll", "AppId": 1, "codeStr": 'return {"adChar"=AppJsObject.comTest1.adChar;doc=com.tlbDoc(AppJsObject.comTest1 )};'   }   
+
+   
+		 ] 
+		AE.OpenApp(Req3,10,true); 
+}		 
+	
+
+var  ComcreateEmbedEx1=function (){
+//调用//com   Shell.Explorer.2  可视化 ,"pos":1, "AppShow":true  
+var Req4= [{"emit":"open","Obj":"dll","AppId": 1,"pos":1,"src":[  {                       //,  私有的必需,在appemit登录窗口，我的应用，插件中设置sha1 pid  AuthKey等数据
+ 								//   "asAdmin":0   //1需要管理员权限注册 0不需要
+								//	,"reg":null    //使用appemit直接调用，一般可以不注册。null 不注册   true 注册 false 卸载注册
+                                      ComDll:"Com"							 //com组件,不写默认为dll 
+								    , createType:"createEmbedEx"                //       createEmbedEx , createObject(clsId,iid)  ,   queryObjectR,  getObject ; 
+ 									 ,objName:"explorer2"              //自行定义   
+									  ,comCarrier:"custom"           // createEmbed可视化  picture(图片控件设置)、static 、winform  默认 推荐 custom           //不同类型组件采取不要载体
+  					              //  ,dllFile:"/plugins/private/50FCF891-1B93-4AE5-8A66-AB26A3C03378/CSNET2ClassLibrary.dll"     //  必须 \\   / 分隔, 程序集或者Dll文件 AppJsLibrary.sysAsmObj ,个人的插件放在/plugins/private/clsId/文件夹下面
+  								//   ,pid:"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"
+								// 	,AuthKey:"A1-rbJouaNIsm-NwndUCunpnRW8GYw-72Sp7XbDjiSQ2MuXtEaFyrs1c4nTBrqXHrKu"                //pid的授权，appemit网站获取
+									 ,clsId :"Shell.Explorer.2"   //"Scripting.FileSystemObject"
+                                  //  ,CLASSES_ROOT:null        //自行开发dll不用注册，则不用设置
+ 								    ,ver:"1.0.0"  
+								//	,iid:null  
+								// ,data:'{"msg":"init from JS2","info":12}'               //发送给dll  数据
+									
+								   }    
+						    ]
+						 ,"AppShow":true                  //整体不可见 必须设置，默认可见   
+					
+						 ,"par":{"webJs":0},"par0":{"AppStep":{"init":null, "loaded": 'AppJsObject.explorer2.Navigate("http://www.baidu.com")', "destroy":null, "closed":null}, "AppMethod":"msg Synchronization component need set: POST" }
+						 }
+			  	  //返回
+				 , { "emit":"runCmd","Obj":"dll", "AppId": 1, "codeStr": "return AppJsFun.json.tryParse('{a:3}');" }  
+
+   
+		 ] 
+		AE.OpenApp(Req4,10,true); 
+}	
+
+
+
+	
+/*
+appemit 调用 C# 函数时遵守 COM 调用传参规则，
+调用 COM 函数传参时，如果 COM 函数支持参数自动类型识别 —— 则 appemit 优先使用 COM 函数需要的类型。
+否则按默认规则处理：整数默认处理为 32 位整型(int,int32)，小数默认处理为64位浮点数(double)。
+
+调用 C# 函数时不支持参数自动类型识别和转换，
+而 C# 是静态语言，参数类型不一致会提示找不到函数，
+这时候可以使用 com 名字空间提供的以下函数显式创建指定类型的对象：
+ com.SetPreferredArrayType()
+ 
+
+appemit数值数组传入 COM 默认为 double 类型数组，
+单个数值，整数默认为 32 位整型（int），小数默认为 64 位浮点数（ double ）。 
+字符串或字符串数组默认为 BSTR 类型。
+
+ 
+ 提供了以下函数可以明确的声明 COM 参数的类型：
+-------------------------------------------------------------------
+com.byte() 将参数指定的数值或数组声明为 8 位整型数值。
+com.ubyte()  将参数指定的数值或数组声明为 8 位无符号整型数值。
+com.word() 将参数指定的数值或数组声明为 16 位整型数值。
+com.uword() 将参数指定的数值或数组声明为 16 位无符号整型数值。
+com.int() 将参数指定的数值或数组声明为 32 位整型数值。
+com.uint() 将参数指定的数值或数组声明为 32 位无符号整型数值。
+com.long() 将参数指定的数值或数组声明为 64 位整型数值。
+com.ulong() 将参数指定的数值或数组声明为 64 位无符号整型数值。
+com.float() 将参数指定的数值或数组声明为 32 位浮点数值。
+com.double() 将参数指定的数值或数组声明为 64 位浮点数值。
+com.Variant() 将参数指定的值或数组声明为变体类型。
+-------------------------------------------------------------------
+要注意不同编程语言之间的差别： 
+VB6/VBA 中 Integer 是16位数值，Long 是32位数值，
+而在 C# 中 int 是32位数值, long 是64位数值，
+更重要的不是类型名字，而是存储长度
+
+
+上面这些函数可以在参数中指定数值，
+返回的 com.Variant 对象已经带上了兼容 .Net 的类型信息，
+都可以作为 .Net 函数的参数使用。
+*/
+
+
+
+</script>
+</body>
+</html>

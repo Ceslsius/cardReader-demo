@@ -1,0 +1,607 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+ -->
+   <style type="text/css">
+  .Appboxs {
+  margin-top:10px; display: -webkit-box;     display: -moz-box;  display: -ms-flexbox;  display: -webkit-flex;display: flex; display: box;  display: flexbox;  justify-content:space-around;
+}
+</style>  
+</head>
+
+<body >
+
+
+<div class="container">
+<input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+     <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button> &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp; &nbsp; &nbsp; &nbsp;<a href="index.html" target="_blank">hardware Demo</a> &nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed</a>&nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp;  &nbsp; <a href="../login.html" target="_blank">Register</a> 
+      <div >  
+	  
+	  网速不好，可测试RTSP源2： rtsp://admin:evro0811@89.21.77.183:33556/
+		<div style="font-size:10px">v1. libvlc  支持多开:   
+				<!-- <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.zhihu.com"}}'/>
+ -->		 	
+ <input type="text" class="form-control" size="70" style="margin-bottom:3px;" id="input_par" value=' {"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par":{ "mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1,"bgcolor":"2A2937"}}'/>
+	 
+		 <button type="button" id="btn_1" onclick="input_App() " >do it</button><button type="button" id="btn_2" onclick="libvlc_snap() " >libvlc_snap</button>
+			 <button type="button" id="btn3 " onclick="regEvent() " >regEvent</button> 
+ 
+			  
+			  <button type="button" id="btn3 " onclick="runcode1() " >调用对象</button> 
+			      <button type="button" id="btn3 " onclick="set_Logo() " >设置水印</button> 
+			  
+			  
+           <button type="button" id="btn3 " onclick="transcode_save() " >transcode_保存</button> 
+		    <button type="button" id="btn3 " onclick="newOpen() " >切换视频源</button> 
+
+		</div>
+	  
+		 	    <div style="font-size:10px">v2. NPAPI网页|IE内核 方便多开:     <button type="button" id="btn3 " onclick="NPweb()" >np网页内核</button>  <button type="button" id="btn3 " onclick="IEwebvlc()" >IE网页内核</button>      
+      <button type="button" id="btn3 " onclick="callwebvlc() " >调用 web vlc</button>  </div>
+	
+	<div style="font-size:10px"><a href="rtsp_ogg.html" target="_blank">v3. 转为ogg ，支持原生浏览器</a> 
+	    <a href="rtsp2WebRTC.html" target="_blank">v4. 转为webRTC ，支持原生浏览器</a><div><a href="rtsp2.html" target="_blank">f2开源库mplayer</a>&nbsp;<a href="rtsp3.html" target="_blank">f3开源库mpvPlayer</a>&nbsp;<a href="rtsp4.html" target="_blank">f4 easyPlayerRTSP</a>&nbsp;
+  <div style="font-size:10px">v11.libvlc插件播放多个rtsp,或者参考 layApp.html布局。或者使用web内核，直接网页设置多个object:    <button type="button" id="btn3 " onclick="array_apps()" >多个</button>  </div> 	
+  <div style="font-size:10px">close  :  {"emit":"close","Obj":"libvlc","AppId":1}           &nbsp;  &nbsp; &nbsp;      or   &nbsp;   &nbsp; {"emit":"closeAll","Obj":"libvlc"}</div>      
+
+
+<!--  .Appboxs {
+                margin: 0 30px 0 260px;
+                padding: 40px 0 0 0;
+                position:absolute;绝对
+                top: 30px; 固定上部
+                left: 3%; 左边留成百分比
+                width:1200px;宽度固定
+                }
+ 
+当左右拉动放大缩小浏览器时，不会变化。
+ -->
+ 
+		   </div>
+             <div class="Appboxs" >
+			 
+			 <!--    textarea或者改为div  都可以,绑定嵌入APP的位置, AppEmbed 要一致。如果要跟随浏览器变化大小，设置相对%比例即可-->
+ 		    <div id="AppEmbed1"  style="border: solid 1px #F0F0F0; min-width:30px;min-height:20px;width:400px;height:360px" ></div>
+			 
+			 <div id="AppEmbed2"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:400px;height:360px" ></div>
+    <!--   <div id="AppEmbed1"  style="border: solid 1px #F0F0F0; min-width:30px;min-height:20px;width:1200px;height:400px" ></div>-->
+			                
+		</div>
+	 
+              <div style=" margin-left:1200px; margin-top:1200px;text-align:center ">
+			     测试滚动 
+		</div>  
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+ 
+<script>
+ /**方案说明 
+A 方案 VLC播放RTSP  见rtsp.html , 可以直接libvlc调用，或者网页内核打开，或者转码ogg 或者 webtrc
+B 方案 mplayer播放RTSP  见rtsp2.html
+C 方案 mpvPlayer播放RTSP  见rtsp3.html
+D 方案 easyPlayerRTSP调用ffmpeg库播放RTSP .见rtsp4.html
+ 
+ ///////////////////////////////////////////////
+ A 方案 默认vlc插件为2.2.5.1
+ 1  直接使用dll接口,libvlc播放
+ 2  使用网页形式object播放
+ 3  转码webrtc，支持服务器
+ 4   转码ogg
+*/
+ 
+ /*
+ //方案说明
+ //  plugins/vlc-help.txt 有英文参数介绍
+ //默认vlc插件为2.2.5.1
+ 
+ v1 libvlc插件播放,300ms左右延迟，实地请重新测试。
+ 
+	https://wiki.videolan.org/VLC_command-line_help/
+ 	https://blog.csdn.net/langal1212/article/details/77676592
+	https://blog.csdn.net/myaccella/article/details/7027962?locationNum=8 vlc 详细使用方法 参数中文
+				
+默认引擎  "par":{ "engine":[
+										   "--subsdec-encoding=GB18030",  //字幕默认使用中文编码
+										 "--freetype-font=Microsoft JhengHei"
+										 ,"--no-snapshot-preview"
+										 ,"-I","dummy"
+										 ,"--ignore-config"
+										 ]}
+	 
+	   //Vista 之前默认  --freetype-font=宋体。//WIN7可用字体：Arial Unicode MS,DFKai-SB, Microsoft JhengHei, MingLiU, MingLiU-ExtB, MingLiU_HKSCS, MingLiU_HKSCS-ExtB, PMingLiU, PMingLiU-ExtB
+	   
+				 减少VLC开始接收视频花屏现象，可以在engine里面加上： 
+				"--network-caching=500",                   //网络额外缓存值 (ms)500-800 ,默认300   //本地需要设置 --file-caching=500
+				"--rtsp-frame-buffer-size=500000",   //RTSP帧缓冲大小，500000-700000,  默认大小为100000
+				"--rtsp-tcp",                           //RTSP采用TCP传输方式   
+				
+			 Direct3D video output
+			 "--vout=direct2d"                  //若不支持3D改为2D
+				
+			禁用硬件解码（显卡支持硬解的可略过）
+			
+			hardware acceleration
+            DirectX (DirectDraw) video output 	--directx-hw-yuv, --no-directx-hw-yuv 
+			 --overlay, --no-overlay    Overlay video output (default enabled)Overlay is the hardware acceleration capability of your video card(ability to render video directly). VLC will try to use it bydefault. (default enabled)
+			 
+			 平均时钟应用计数器，要修改只能为10000
+			 --cr-average=10000"     vlc播放一个非常不规范的网络视频流时，经常会遇到卡顿的情况，将–cr-average设置为10000即可解决。该参数名为平均时钟应用计数器，是个整数。在播放udp传输的ts视频流时经常遇到这个问题
+			 
+			 
+				最后考虑降低来源视频的分辨率，提高宽带。
+				 //参考 https://www.pianshen.com/article/14492017429/ ；plugins/vlc-help.txt 有参数介绍
+				 
+ v2  NPAPI网页播放,500ms左右延迟  ,或者IE ActiveX网页播放         https://wiki.videolan.org/Documentation%3aWebPlugin#Input_object
+ v3 转为ogg ，支持原生浏览器,1-2s左右延迟
+ v4 转为webRTC ，800ms左右延迟,支持原生浏览器,格式要求严格。H264_AAC H264_PCMALAW MICRO PCM 摄像头设置 audio codec   ALAW or MULAW
+ 
+ 
+ */
+ 
+  //init_App();    //载入页面运行 
+  
+  var webMp4_demo1="https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/n1.mp4"
+  var webRtsp_demo2="rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+  var mp4_demo0="/demo/htmlDemo/file/q1.mp4"
+  
+	var init_App=function(){   
+		AE.InitApp(document.getElementById('input_url').value);
+	
+	}
+/**
+//////////////////v1 libvlc ///////////////////////////////////////////			   
+ // v1 libvlc 
+// "par0" 设置
+//   "trackbar":0  隐藏进度条
+"bgcolor": 3615018 或者6位16进制的字符串 "2A2937",  设置控制栏的颜色  https://www.sioe.cn/yingyong/yanse-rgb-16/
+//   "event":注册获得反馈
+//loop  0只播放第一个。
+          ture或者 -1 一直重复
+          1,2,3,4,...n : mrl 为数组 ,则整组重复n组； 
+		  2,3,4,...n: mrl 字符串,则单曲重复n次 
+// 最小最大关闭按钮 默认"par0":"minmaxclose":[0,0,1]
+// 然后可以设置窗口栏  "par0":"windowPars":[12,28,10,10,0,0]  默认 [12,28,10,10,0,0] 字体大小,按钮宽度,按钮高度,标题栏高度,背景色,前景色
+
+
+
+///////////////////////////////////////////////////
+  // ReqPar=[{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par":{ "mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }},{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":2,"par":{ "engine":["--subsdec-encoding=GB18030", "--freetype-font=Microsoft JhengHei","--no-snapshot-preview","-I","dummy" ,"--ignore-config"],"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0},"par0":{"fullscreen":true,"volume":70,"autoplay":true,"controls":true ,"snapPath":"/file/snap/" ,"snapFormat":".bmp","snapRBUTTONDBLCLK":1,"snapWidth":0,"snapHeight":0}}]	;
+
+
+////////////////AppJsObject.libvlc 来控制 调取,使用 runCmd 请求方法控制 ,未全部测试////////////////////////////////////////////////////	
+//AE.OpenApp({"emit":"runCmd","Obj":"libvlc","AppId":1,"codeStr":"AppJsObject.libvlc.pause();return {length:AppJsObject.libvlc.length }" }); 
+newOpen(mrl,localFile) =不关闭播放器新打开媒体(会自动停止已经播放的视频)
+play() = 播放
+stop() = 停止
+pause() = 暂停
+resume() = 继续 
+width = 视频宽度
+height = 视频高度
+fullscreen = 是否全屏
+volume = 音量,0到100范围的整数值\n0为静音
+audioChannel = 声道
+audioTrack = 音轨
+getAudioTrackCount() = 获取音轨总数
+getAudioTrackDescription() = 获取音轨描述
+audioDelay = 音频延迟时间，单位毫秒
+mute = 是否静音
+time = 当前播放位置,单位毫秒
+length = 视频总时长,单位毫秒
+setWindow(.(winform) = 指定输出视频的窗口对象
+state
+	    1 libvlc_Opening 
+		  2 libvlc_Buffering
+		  3 libvlc_Playing
+		 4 libvlc_Paused
+		  5 libvlc_Stopped
+		  6 libvlc_Ended
+		 7 libvlc_Error
+isOpening() = 视频是否已打开
+isBuffering() = 视频是否正在缓冲
+isPlaying() = 视频是否正在播放
+isPaused() = 视频是否已暂停
+isStopped() = 视频是否已停止
+isEnded() = 视频是否已结束
+isError() = 视频是否遇到错误
+spu = 当前字幕索引
+spuDelay = 字幕延迟时间,单位毫秒
+spuDescription = 返回字幕描述数组 
+takeSnapshot(.("图像文件路径",宽度,高度) = 截图\n宽度高度参数可省略
+spuLoad(.("字幕路径") = 加载字幕
+spuDescription = 获取数组包含所有字幕条目描述
+loadMediaFile(.("本体文件路径") = 打开本地文件创建媒体文件描述对象
+loadMedia(.("媒体文件地址") = 使用协议地址创建媒体文件描述对象
+getMedia() = 返回媒体文件描述对象\n!libvlcmedia.
+setMedia(.(媒体文件描述对象) = 修改媒体文件描述对象
+**/
+/////////////////////////注册事件，回调////////////////////////////
+	//   "event":["click","Rclick","resume","play","pause","stop","end","volume","mute","fullscreen","Error","LengthChanged","trackbar","close"] 监控左右单击事件，右键双击截图 左键双击全屏
+	//可以通过回调函数来处理对应的注册事件
+//先定义回调函数
+var eventAll=["click","Rclick","resume","play","pause","stop","end","volume","mute","fullscreen","Error","LengthChanged","trackbar","close"]   //LengthChanged获取总长
+callback1= function(Jdata,inPar){
+   console.log("call balc 1",Jdata,inPar)  //业务处理，play要考虑 resume之后也会有一个play
+   if (Jdata.data && Jdata.data.first) {
+     console.log("第一次播放成功")
+   
+   }
+ 
+ }
+ 
+ 
+ 
+function regEvent(){
+   
+   var ReqPar11={"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par":{ "mrl":webMp4_demo1,"localFile":0},"par0":{"minmaxclose":[0,0,1],"volume":70,"autoplay":1,"controls":1,"event":eventAll }}
+     
+      
+	AE.OpenApp(ReqPar11);
+ }
+ 
+ //控制vlc///////////////////////////////////////////////////////////
+ callback2= function(Jdata,inPar){
+      //业务处理，获得cmd1的运行结果
+   if (Jdata.data ) {
+     console.log("处理业务数据",Jdata.data )
+   
+      }
+ 
+ }
+ 
+   //回调函数，如果equ有多个反馈同时相等，都会回调。要确保唯一，可以指定rid或者AppMark
+    AE.callbackFunc= [{"equ": { "Obj":"libvlc",  "event": "play" ,"rep": 0},"func":callback1, "inPar":"inPar 111"}
+	                              ,{"equ": { "Obj":"libvlc",  "rid": "libvlcLength_mark" ,"rep": 0},"func":callback2, "inPar":null}  //测试
+								  ] ;  
+								  
+								  
+								  
+ function runcode1(){
+ var  cmd1=AE.txt2code(function(){/*!@preserve
+ if (AppJsObject.libvlc.state) {
+    AppJsObject.libvlc.time=AppJsObject.libvlc.length/4 ;       //设置位置
+     return  {time:AppJsObject.libvlc.time,length:AppJsObject.libvlc.length,state:AppJsObject.libvlc.state}
+  }
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req={"emit":"runCmd","Obj":"libvlc","rid":"libvlcLength_mark","AppId":1,"codeStr":cmd1 }    //"AppMark":"libvlcLength_mark"
+ 
+      AE.OpenApp(Req);
+
+}
+
+function newOpen(){
+ 
+   //newOpen(mrl,localFile) =不关闭播放器新打开媒体(会自动停止已经播放的视频)
+    AE.OpenApp({"emit":"runCmd","Obj":"libvlc","AppId":1,"codeStr":'AppJsObject.libvlc.newOpen("'+mp4_demo0+'",1);return {执行了}' }); 
+}
+ 
+//////////////////播放同时下载//////////////////////////////////////////////////////////////////
+function transcode_save() {
+/**
+可以搜索了解更多vlc的配置，当然，这个engineAdd是engine的一部分，也可以完整设置engine。
+ 
+//自动保存，一个引擎，多个视频源，只会保存第一个。
+增加 par0":{"engineAdd":"--sout=#duplicate{dst=file{dst=out1.mp4},dst=display}"}  
+//保存时会自动删除重名视频。会自动保存，需要播放完需要关闭后，保存的文件才能正确打开。
+// 这种方式保存，最好每次都是AE.OpenApp方法重开。 如果是切换源，保存名称有问题。
+
+ 如果需要对原视频转码再播放下载，设置为
+ par0":{"engineAdd":"--sout=#transcode{vcodec=mp4v,acodec=mpga,vb=140,ab=64.2,deinterlace}:duplicate{dst=file{dst=out1.mp4},dst=display}"}
+ 
+ 参数 https://blog.csdn.net/myaccella/article/details/7027962?locationNum=8
+ 
+
+
+vcodec = mp4v 是要编码的视频格式(mp4v是MPEG-4，mpgv是MPEG-1，还有h263，DIV1，DIV2，DIV3，I420，I422，I444，RV24，YUY2)
+acodec = mpga 是要编码的音频格式(mpga是MPEG音频层2，a52是A52，即AC3声音)。
+vb = 800是以Kbit / s为单位的视频比特率。
+ab = 128是Kbit / s的音频比特率。
+deinterlace告诉VLC即时解除对视频的隔行扫描。
+
+ 在转码指令中使用了MPEG音频和视频编解码器。对输出文件使用匹配的扩展名(在本例中为mpg)似乎很重要。
+ 否则，打开保存的文件进行播放时，VLC会感到困惑。如果 决定切换到其他视频格式，请记住这一点
+
+
+下面的参数没有测试
+// "--sout=#stream_out_duplicate{dst=display,dst=std{access=file,mux=ts,dst=/path/file.mpg}}"
+ //"--sub-source marq --sout=file/ps:example.mpg --sout-display"
+ //"--sub-source marq --sout=#stream_out_duplicate{dst=display,dst=std{access=file,mux=ts,dst=/path/file.mpg}}"
+ 
+ 
+ 
+ **/
+ ReqPar11={"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par":{"mrl":webMp4_demo1,"localFile":0},"par0":{"engineAdd":["--sout=#duplicate{dst=file{dst=out1.mp4},dst=display}"],"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+  AE.OpenApp(ReqPar11);
+ }
+ 
+ //水印,水印贴片并没有保存到视频中去。
+ function set_Logo() {
+/**
+可以搜索了解更多vlc的配置，当然，这个engineAdd是engine的一部分，也可以完整设置engine。
+//水印,这个地方的地址注意使用 \\\\
+ "engineAdd":"--video-filter=logo{file=${dir_Cur}\\\\demo\\\\htmlDemo\\\\file\\\\tiepian.png,opacity=100,repeat=1,delay=2000,position=3}"
+ 
+https://wiki.videolan.org/Documentation:Modules/logo/
+file "c:\\audio.png");//Logo 文件名
+x //logo的 X 坐标。
+y // logo的 Y 坐标。
+ delay =20//标志的间隔图像时间为毫秒,图像显示间隔时间 0 - 60000 毫秒。
+repeat= -1标志logo的循环,  标志动画的循环数量。-1 = 继续, 0 = 关闭
+opacity=122 // logo 透明度 (数值介于 0(完全透明) 与 255(完全不透明)
+position =0  ，1 (左), 2 (右), 4 (顶部), 8 (底部), 5 (左上), 6 (右上), 9 (左下), 10 (右下),也可以混合使用这些值，例如 6=4+2 表示右上)。
+ 	  
+ **/
+ ReqPar12={"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par":{"mrl":mp4_demo0,"localFile":1},"par0":{"engineAdd":["--video-filter=logo{file=${dir_Cur}\\\\demo\\\\htmlDemo\\\\file\\\\tiepian.png,opacity=100,repeat=1,delay=100,position=3}"],"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+  AE.OpenApp(ReqPar12);
+ }
+ 
+ //////////////////////////////////////////////////
+	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar0={};
+	       ReqPar0=JSON.parse(document.getElementById("input_par").value);
+		 //  AE.OpenApp(ReqPar);
+	   //执行文本框里的内容
+ AE.OpenApp(ReqPar0);
+		 
+		 
+  }	 
+  
+ //多个播放，使用数组形式。或者参考 layApp.html布局。或者使用web内核，直接网页设置多个object。
+  	var array_apps= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar11=  [{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par":{ "mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }},{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":2,"par":{ "engine":["--subsdec-encoding=GB18030", "--freetype-font=Microsoft JhengHei","--no-snapshot-preview","-I","dummy" ,"--ignore-config"],"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0},"par0":{"fullscreen":true,"volume":70,"autoplay":true,"controls":true ,"snapPath":"/file/snap/" ,"snapFormat":".bmp","snapRBUTTONDBLCLK":1,"snapWidth":0,"snapHeight":0 }}]
+  
+    AE.OpenApp(ReqPar11);
+		 
+		 
+  }	 
+ 
+  
+  
+/**
+ ///////////v2. NPAPI网页//////// libvlc的功能都有,功能更强大 ///////////////////
+//v2. NPAPI网页 通过webkit内核打开 可以设置mrl和其它参数，其等效实现htmlStr0相同的代码。
+//更多 https://wiki.videolan.org/Documentation:WebPlugin/#Embed_tag_attributes 
+
+https://blog.csdn.net/jxbinwd/article/details/83615203
+//或者设置mrl 等效 实现html   
+
+ **/
+//AE.txt2code 函数 里面的 < / script>, 需要修改为 <\/script>，另外vue使用AE.txt2code_Vue
+function NPweb(){
+
+var   htmlStr=AE.txt2code(function(){/*!@preserve
+ 
+<object type='application/x-vlc-plugin' id='vlc' events='True' width="98%" height="96%">
+    <param name='mrl' value='rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov' />
+    <param name='volume' value='50' />
+    <param name='autoplay' value='true' />
+    <param name='loop' value='false' />
+    <param name='fullscreen' value='false' />
+ </object>
+ 
+*/});
+//或者将htmlStr保存到本地文件，定义  "HttpServer_startUrl":"demo/htmlDemo/rtsp_HttpServer_startUrl.html"
+// 优先级 htmlStr > HttpServer_startUrl>mrl
+//  ReqPar= {"emit":"open","Obj":"media","AppType":1,"pos":1,"AppId":1,"par":{"htmlStr":null,"HttpServer_startUrl":"demo/htmlDemo/rtsp_HttpServer_startUrl.html"}  } 
+
+
+ ReqPar= {"emit":"open","Obj":"media","AppType":1,"pos":1,"AppId":1,"par":{"htmlStr":htmlStr }  } 
+ AE.OpenApp(ReqPar)
+ }
+	
+ 
+//实现多开
+var   htmlStr2=AE.txt2code(function(){/*!@preserve
+<object type='application/x-vlc-plugin' id='vlc1' events='True' width="20%" height="100%">
+    <param name='mrl' value='rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov' />
+    <param name='volume' value='50' />
+    <param name='autoplay' value='true' />
+    <param name='loop' value='false' />
+    <param name='fullscreen' value='false' />
+</object>
+<object type='application/x-vlc-plugin' id='vlc3' events='True' width="20%" height="100%">
+    <param name='mrl' value='rtmp://58.200.131.2:1935/livetv/cctv2' />
+    <param name='volume' value='50' />
+    <param name='autoplay' value='true' />
+    <param name='loop' value='false' />
+    <param name='fullscreen' value='false' />
+</object>
+ 
+
+*/});	
+
+ 
+ 
+//  
+	var   htmlStr_del=AE.txt2code(function(){/*!@preserve
+ <div>
+	<div><object type='application/x-vlc-plugin' id='vlc1' events='True' width="80%" height="80%">
+    <param name='mrl' value='rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov' />
+    <param name='volume' value='50' />
+    <param name='autoplay' value='true' />
+    <param name='loop' value='false' />
+    <param name='fullscreen' value='false' />
+</object>
+</div>
+ 
+ <div class="contText">
+  <select>
+  <option value ="volvo">Volvo</option>
+  <option value ="saab">Saab</option>
+  <option value="opel">Opel</option>
+  <option value="audi">Audi</option>
+</select>
+<iframe width='100%' height='100%' frameborder='0' filter="progid:DxImageTransform.Microsoft.Alpha(style=0,opacity=1)" style='visibility: inherit;position: absolute; top: 0px; left: 0px;z-index: -1; border-style: none; background-color: red;'>
+ 
+</iframe>.
+ 
+</div>
+ </div>
+*/});
+
+ 
+
+/**
+ ///////////v22. IE网页/////// //////////////
+//v22.  网页 通过IE内核打开 可以设置mrl和其它参数，其等效实现htmlStr0相同的代码。
+//更多 https://wiki.videolan.org/Documentation:WebPlugin/#Embed_tag_attributes 
+//或者设置mrl 等效 实现html   
+
+ **/
+////////////////////////select能在VLC前面///////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //IE 内核打开vlc的axvlc.dll，播放视频   //可以嵌入到web中，能叠加div到object前面
+ 
+ var   htmlStr6=AE.txt2code(function(){/*!@preserve
+ <div>
+ 
+<select>
+  <option value ="volvo">Volvo</option>
+  <option value ="saab">Saab</option>
+  <option value="opel">Opel</option>
+  <option value="audi">Audi</option>
+</select>
+<object classid="clsid:9BE31822-FDAD-461B-AD51-BE1D1C159921" width="340" height="300">
+<embed type="application/x-vlc-plugin" width="340" height="300" />
+    <param name="autostart" value="true" />
+    <param name="allowfullscreen" value="true" />
+	<param name="MRL" ref value="rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov">
+</object>
+</div>
+ 
+*/});	
+
+//IE控件调用
+//是否需要管理员权限运行需要管理员
+var embed_object_vlc={
+								   "objName":"axvlc"    
+								   ,"pid":"axvlc"   //使用公共插件  pid 名称，  pid 名称是AE共有的，则调用共有的插件                       
+								    ,"reg":true    //null 不执行注册   1强制操作 true 未注册则注册  false 卸载注册 (重启AppEmit后，就不能加载dll了)  
+									,"asAdmin":0   //1需要管理员权限注册 0不需要 ,win7管理员身份会有提示确认窗口   
+								   ,"CLASSES_ROOT":"HKEY_CLASSES_ROOT\\VideoLAN.VLCPlugin.2\\CLSID"   
+								   ,"clsId":"{9BE31822-FDAD-461B-AD51-BE1D1C159921}"                      
+ 								 }  ;
+ 
+
+  ReqPar6= {"emit":"open","Obj":"media","AppType":1,"pos":1,"AppId":1,"par":{"htmlStr":htmlStr6,"HttpServer_startUrl":null,"kernel":1,"embed_object" :[embed_object_vlc] }  } 
+	
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+//  ReqPar6= {"emit":"open","Obj":"media","AppType":1,"pos":1,"AppId":1,"par":{"htmlStr":htmlStr6,"HttpServer_startUrl":null,"kernel":2  }  } 
+
+  
+  //测试
+  /*
+  ReqPar=[{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par":{ "mrl":"rtmp://58.200.131.2:1935/livetv/cctv1","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+                ,{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":2,"par":{ "mrl":"rtmp://58.200.131.2:1935/livetv/cctv2","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+                ,{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":3,"par":{ "mrl":"rtmp://58.200.131.2:1935/livetv/cctv3","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+                ,{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":4,"par":{ "mrl":"rtmp://58.200.131.2:1935/livetv/cctv4","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+                ,{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":5,"par":{ "mrl":"rtmp://58.200.131.2:1935/livetv/cctv5","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+                ,{"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":6,"par":{ "mrl":"rtmp://58.200.131.2:1935/livetv/cctv6","localFile":0},"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1 }}
+
+  ]	;
+  */
+  
+  IEwebvlc=function(){
+  AE.OpenApp(ReqPar6);
+  }
+
+  /**
+  //拍照//runCall 是直接调用对象的函数, runCmd是运行代码
+  **/
+		libvlc_snap=function(){
+		//    默认 inPar["objName"]:="libvlc"，如果修改可以在  {"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par"里面设置ObjName
+		//AppJsObject[inPar["objName"]].takeSnap(snapPath,snapWidth,snapHeight,snapNum)
+            var snapPath="/file/snap/a_"+Date.now()+".bmp"
+            var  ReqPar8={"emit":"runCall","Obj":"libvlc","AppId":1,"AppMark":"sdfdAppMark","src":[],"par":{"objName":"libvlc","callFun":{"takeSnap":[snapPath,0,0,0]}  }}	   
+           AE.OpenApp(ReqPar8);
+		}
+ 
+ 
+ /**
+//////////////在网页打开交互数据////////////////////////////
+//https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/n1.mp4
+更多 https://wiki.videolan.org/Documentation:WebPlugin/#Embed_tag_attributes 
+//报错难以发现
+//https://blog.csdn.net/u014041540/article/details/51778358 例子
+//AE.txt2code 函数 里面的 < / script>, 需要修改为 <\/script>，另外vue使用AE.txt2code_Vue
+//AppJsObject.web.cookieData().getCookies("jsdelivr.net" )
+**/
+var   htmlStr8=AE.txt2code(function(){/*!@preserve
+ <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/firebug-lite/1.4.0/firebug-lite.js#startOpened"><\/script>  -->
+
+   <button type="button" id="btn3 " onclick="toggleMute()" >toggleMute</button> 
+<object type='application/x-vlc-plugin' id='vlc' events='True' width="98%" height="96%">
+    <param name='mrl' value='https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/n1.mp4' />
+ 
+    <param name='volume' value='50' />
+    <param name='autoplay' value='true' />
+    <param name='loop' value='false' />
+    <param name='fullscreen' value='false' />
+ </object>
+ 
+ <script type="text/javascript">
+  //kernel=1 IE 引入json2  解决IE10不支持JSON.stringify https://github.com/douglascrockford/JSON-js/blob/master/json2.js
+  //  if(typeof JSON!=="object"){JSON={}}(function(){"use strict";var rx_one=/^[\],:{}\s]*$/;var rx_two=/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g;var rx_three=/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g;var rx_four=/(?:^|:|,)(?:\s*\[)+/g;var rx_escapable=/[\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;var rx_dangerous=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;function f(n){return(n<10)?"0"+n:n}function this_value(){return this.valueOf()}if(typeof Date.prototype.toJSON!=="function"){Date.prototype.toJSON=function(){return isFinite(this.valueOf())?(this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z"):null};Boolean.prototype.toJSON=this_value;Number.prototype.toJSON=this_value;String.prototype.toJSON=this_value}var gap;var indent;var meta;var rep;function quote(string){rx_escapable.lastIndex=0;return rx_escapable.test(string)?"\""+string.replace(rx_escapable,function(a){var c=meta[a];return typeof c==="string"?c:"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4)})+"\"":"\""+string+"\""}function str(key,holder){var i;var k;var v;var length;var mind=gap;var partial;var value=holder[key];if(value&&typeof value==="object"&&typeof value.toJSON==="function"){value=value.toJSON(key)}if(typeof rep==="function"){value=rep.call(holder,key,value)}switch(typeof value){case"string":return quote(value);case"number":return(isFinite(value))?String(value):"null";case"boolean":case"null":return String(value);case"object":if(!value){return"null"}gap+=indent;partial=[];if(Object.prototype.toString.apply(value)==="[object Array]"){length=value.length;for(i=0;i<length;i+=1){partial[i]=str(i,value)||"null"}v=partial.length===0?"[]":gap?("[\n"+gap+partial.join(",\n"+gap)+"\n"+mind+"]"):"["+partial.join(",")+"]";gap=mind;return v}if(rep&&typeof rep==="object"){length=rep.length;for(i=0;i<length;i+=1){if(typeof rep[i]==="string"){k=rep[i];v=str(k,value);if(v){partial.push(quote(k)+((gap)?": ":":")+v)}}}}else{for(k in value){if(Object.prototype.hasOwnProperty.call(value,k)){v=str(k,value);if(v){partial.push(quote(k)+((gap)?": ":":")+v)}}}}v=partial.length===0?"{}":gap?"{\n"+gap+partial.join(",\n"+gap)+"\n"+mind+"}":"{"+partial.join(",")+"}";gap=mind;return v}}if(typeof JSON.stringify!=="function"){meta={"\b":"\\b","\t":"\\t","\n":"\\n","\f":"\\f","\r":"\\r","\"":"\\\"","\\":"\\\\"};JSON.stringify=function(value,replacer,space){var i;gap="";indent="";if(typeof space==="number"){for(i=0;i<space;i+=1){indent+=" "}}else if(typeof space==="string"){indent=space}rep=replacer;if(replacer&&typeof replacer!=="function"&&(typeof replacer!=="object"||typeof replacer.length!=="number")){throw new Error("JSON.stringify");}return str("",{"":value})}}if(typeof JSON.parse!=="function"){JSON.parse=function(text,reviver){var j;function walk(holder,key){var k;var v;var value=holder[key];if(value&&typeof value==="object"){for(k in value){if(Object.prototype.hasOwnProperty.call(value,k)){v=walk(value,k);if(v!==undefined){value[k]=v}else{delete value[k]}}}}return reviver.call(holder,key,value)}text=String(text);rx_dangerous.lastIndex=0;if(rx_dangerous.test(text)){text=text.replace(rx_dangerous,function(a){return("\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4))})}if(rx_one.test(text.replace(rx_two,"@").replace(rx_three,"]").replace(rx_four,""))){j=eval("("+text+")");return(typeof reviver==="function")?walk({"":j},""):j}throw new SyntaxError("JSON.parse");}}}());
+
+   var vlc = document.getElementById("vlc");
+   
+   function  toggleMute(){
+     vlc.audio.toggleMute() ;
+  //AppJsFun.log("1");
+ 
+
+  external.runCmd("var a=4;var b=a+1;return {a:a;b:b}")  //AppEmit执行代码return也可以反馈数据
+    //external.emitBack反馈数据, IE 如果报错，则参数全部转换为一个json字符串
+   external.emitBack({cookie:AppJsObject.web.cookieStr(), kernel:AppJsObject.web.kernel,version:vlc.getVersionInfo()});   // external.emitBack反馈数据到chrome浏览器
+
+  external.emitBack(JSON.stringify({"AppMark":"mark2","rid":"rid1","aaa":aaa,"bbb":bbb})) //在前面加载web完成执行js赋值aaa  bbb
+
+  
+   }
+ 
+ 
+<\/script>
+*/});
+//AppJsObject.web.doScript("str") 执行js代码
+//AppJsObject.web.script.var   设置获取变量var
+  callwebvlc=function(){
+  //cookie  {"name":"c1","value":"c1111","domain": "jsdelivr.net", path : "/", expires :  具体时间} expires默认7天
+   ReqPar8=[ {"emit":"open","Obj":"media","AppType":1,"pos":1,"AppId":1
+       ,"par":{
+	  "htmlStr":htmlStr8 ,
+	  "HttpServer_startUrl":null
+	//   ,"URL":"http://www.appemit.com/demo/mp4.html"   //还没有测试
+	   ,"kernel":2 } 
+     ,"par0":{"AppStep":{"init":null, "destroy":null, "closed":null,"loaded":'AppJsObject.web.waitDoc(); AppJsObject.web.doScript(\' var aaa=1;\'); AppJsObject.web.script.bbb=2;  return {aaa:AppJsObject.web.script.aaa, c1:AppJsObject.web.cookieStr()};'} //
+	 //设置cookie，必须要有域名,网址URL方式调用   
+	 ,"AppJsObject":1,"expires":7,"cookieSet":[{"name":"c1","value":"c1111","domain": "jsdelivr.net"},{"name":"c2","value":"c222"}]}     
+   } 
+   ,{"emit":"runCmd","Obj":"media","AppId":1,"codeStr":" return {aaa:AppJsObject.web.script.aaa ,t:'测试'}" } //获得前面设置的aaa
+   ]
+	
+     AE.OpenApp(ReqPar8);
+  }
+ 
+ //AE.OpenApp({"emit":"runCmd","Obj":"media","AppId":1,"codeStr":" return {aaa:AppJsObject.web.script.aaa }" }); 
+ 
+ 
+ 
+</script>
+</body>
+
+</html>

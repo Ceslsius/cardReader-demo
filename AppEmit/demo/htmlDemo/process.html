@@ -1,0 +1,204 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit exe process</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ <!--  <script src="https://cdn.jsdelivr.net/npm/js-base64@3.2.4/base64.min.js"></script>  -->
+ 
+      <style type="text/css">
+        html,body{
+            height: 100%;
+	      width:100%
+        }
+    body{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+     <div style="font-size:10px">  命令行
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value=''/>
+		   	<button type="button" id="btn1" onclick="start_App() " >do it</button> &nbsp; &nbsp;<a href="index.html" target="_blank">index</a> &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed </a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a> &nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">dll</a>
+		   </div>  
+ 
+	 </div>
+		<div style="font-size:10px"> 打开记事本<button type="button" id="btn " onclick="notepad() " >notepad</button>   
+		 
+		 <div style="font-size:10px"> developTool<button type="button" id="btn " onclick="developTool() " >developTool</button>   
+		 
+	<!-- <div style="font-size:10px">win10 UWP应用<button type="button" id="btn " onclick="win10Appshell() " >win10Appshell</button>  -->   
+ 
+	 </div>
+ 
+
+ 	<div style="font-size:10px"> 回调函数<button type="button" id="btn1" onclick="callbackdemo()" >callbackdemo</button>   </div>
+   
+ <div   id="AppEmbed1"  style="border:2px solid #F00;width:800px;height:600px" ></div>
+	 
+  
+
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+/**步骤/
+  /////////////////////////////////////////////////////////////////////////
+                                                                
+为局域网企业高级版定制，只能特定用户使用，普通用户无法使用 ,只能打开注册过sha1的exe文件。
+ 
+限制不支持直接打开的文件类型
+ "msi";"cmd";"js";"jar";"inf";"com";"scr";"reg";"bat";"vbs";"py";"sys";"reg" 
+限制不支持直接打开
+cmd ，powershell
+
+ 常用路径变量  
+ $[dir_Cur] $[dir_AppData_Roaming] $[dir_AppData_Local] $[dir_DESKTOP] 
+ $[dir_FAVORITES] $[dir_COMMON_DOCUMENTS] $[dir_WINDOWS] $[dir_MYDOCUMENTS]
+
+其中$[dir_Cur]可以省略
+
+同一个文件exe，不同版本，都需要加入后台注册sha1.
+
+
+  ///////////////////////////////////////////////////////////////////////
+ // 1. AE.InitApp  连接ws
+ // 2.AE.OpenApp  打开app dll,或者 调用发送命令 runCmd 
+  //3. 结束时一定需要正常退出,调用 的dll需要 stop或者null或者销毁
+ 
+   // 代码里面不能有错误, 要不没有结果
+ 
+   // 全局变量 对象  AppJsObject     AppJsObject.objName 访问实例对象 
+ 
+ //AppStep主要调用过程, 按事件顺序自动执行/////////////////////
+//AppJs_init  生成AppJsObject前执行
+//AppJs_loaded 系统启动APP ,产生AppJsObject对象后执行
+//AppJs_destroy AppJsObject销毁前执行。 
+//AppJs_closed AppJsObject关闭后执行。已经没有AppJsObject对象了
+////////////////////////////
+**/
+   
+
+	  var  reportXPath;
+	  
+	 var init_mark=  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");  //flag=1 调试环境
+	 
+     //  var init_mark=  AE.InitApp("wss://localhost:443/appemit?cid=00000-1&sid=1&flag=1");  //flag=1 调试环境
+    
+  
+	var start_App= function(){
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+		  
+ 		//   ReqPar={"emit":"open","Obj":"flash","src":"D:/work/temp/m1.swf","pos":1,"par0":{"autoPlay":1,"toolbar":0,"rightMenu":0,"hitCaption":0,"hideStop":0,"loop":1,"volumeMute":0}}
+	
+	   	   AE.OpenApp(ReqPar);
+ 
+				 	   
+	   }
+
+ 
+ 
+  var ReqPar1=  {"emit":"open","Obj":"process"
+				         ,"src":	{
+                                     "createType":"exe"				 //推荐默认为exe 打开可输入参数, invoke 新线程打开, wait(运行并等待应用程序关闭),waitInput（运行并等待进程初始化完成并接受输入）		 
+							         ,"objName":"notepad"             //AppJsObject.notepad 来访问此pid //
+								    // ,comCarrier:"custom"           // createEmbed可视化 picture(图片控件设置)、static 、 winform   默认推荐 custom         //不同类型组件采取不同载体
+								//	 ,"sha1":null                    
+	 							 //    ,"file":"notepad.exe"            // C:/Windows/System32/notepad.exe   6.1.7600.16385 (win7_rtm.090713-1255)   sha1: F00AA51C2ED8B2F656318FDC01EE1CF5441011A4
+								  ,"sha1":"F00AA51C2ED8B2F656318FDC01EE1CF5441011A4"    //本地文件必须要sha1, 不同版本，保证file 一致即可,但都需要在后台注册。
+								  ,"file":"$[dir_WINDOWS]/System32/notepad.exe"             
+								   ,"args":""                           //会屏蔽不安全命令,有提示
+								    ,"workDir":null
+									,"AuthKey":"E1-PqmrIPdMxE2dEKoyZQLKoZBx71EAkwijJSaG5BHD12g"   //UID下同名称的相同
+	 							    ,"embed":1        //  1嵌入类似子窗口,关闭网页会关闭程序不是所有窗口都支持； -1浮动窗口跟随，不会关闭exe；   0独立窗口
+									//,"Visible":true
+									}
+				                  ,"pos":1
+								  ,AppShow:true  //embed=0时，false无需嵌入到浏览器窗口
+								  //,"par0":{"AppMethod":"msg Synchronization component need set: POST" }
+								   }
+	   
+	 function notepad(){
+      AE.OpenApp(ReqPar1);
+	 }
+ 
+ //调用demo里面的 developTool.exe
+  var ReqPar2=  {"emit":"open","Obj":"process"
+				         ,"src":	{
+                                     "createType":"exe"				 //推荐默认为exe 打开可输入参数, invoke 新线程打开, wait(运行并等待应用程序关闭),waitInput（运行并等待进程初始化完成并接受输入）		 
+							         ,"objName":"developTool"             //AppJsObject.developTool 来访问此pid //
+								    // ,comCarrier:"custom"           // createEmbed可视化 picture(图片控件设置)、static 、 winform   默认推荐 custom         //不同类型组件采取不同载体
+						 		 ,"sha1":"B6A18FBAC980739D66DD147D39C012F3DA4F3036"  
+								  ,"file":"$[dir_Cur]/demo/developTool/developTool.exe"           
+								   ,"args":""                           //会屏蔽不安全命令,有提示
+								    ,"workDir":null
+									,"AuthKey":"E1-Nw36HYibkrIFB-O9FukGnqm0dwWb-sspQL30un1ld4Q" 
+	 							    ,"embed":-1        //  1嵌入类似子窗口,关闭网页会关闭程序不是所有窗口都支持； -1浮动窗口跟随，不会关闭exe；   0独立窗口
+									//,"Visible":true
+									}
+				                  ,"pos":1
+								  ,AppShow:1  //embed=0时，false无需嵌入到浏览器窗口
+								  //,"par0":{"AppMethod":"msg Synchronization component need set: POST" }
+								   }
+	   
+	 function developTool(){
+      AE.OpenApp(ReqPar2);
+	 }
+ 
+ //暂时关闭
+ //win10 UWP应用 App shell.application 独立打开，
+ 
+ 	 function win10Appshell(){
+	 	         var ReqPar3=  {"emit":"open","Obj":"process"
+				         ,"src":	{
+                                    "createType":"UWP"					 //win10 App shell.application	 
+							        , "objName":"Store"             //AppJsObject.Store  
+								    // ,comCarrier:"custom"           // createEmbed可视化 picture(图片控件设置)、static 、 winform   默认推荐 custom         //不同类型组件采取不同载体
+									,"sha1":null           
+	 							    ,"file":"Microsoft.WindowsStore_8wekyb3d8bbwe!App"             //aumid
+									,"args":""                               //arguments
+									,"options":null
+								    ,"AuthKey": null
+									//,"workDir":null
+	 							    ,"embed":0           // shell 最好设置为0。 //  1嵌入类似子窗口,关闭网页会关闭程序不是所有窗口都支持； -1浮动窗口跟随，不会关闭exe；   0独立窗口
+									//,"Visible":true
+									}
+				                  ,"pos":0
+								  ,AppShow:false  //embed=0时，false无需嵌入到浏览器窗口
+								  ,"par0":{"AppMethod":"POST" }  //WindowsStore需要POST传递消息
+								   }
+	     AE.OpenApp(ReqPar3);
+	 
+	 }
+ 
+ 
+ 
+ 
+   /////////////////////  方法22 设置 回调  {"emit":"runCmd","Obj":"**","AppId":1,"codeStr":codeStr } 接口
+  function callbackFun1(Jdata){
+  console.log("callback1",Jdata)
+  AE.OpenApp({"emit":"runCmd","Obj":"process","AppId":1,"codeStr":' AppJsFun.log( return{status:1,callback:1}' })
+  
+  }
+  function callbackdemo(){
+ 
+		  AE.callbackFunc= [{"equ": { "Obj":"process" ,"AppStatus":1,"rep": 0,"service":AE.service}  //回调函数的条件
+		                                          ,"func":callbackFun1}  
+                                     // , {"equ": { "Obj":"process" ,"rid":2},"func":function(){AE.callbackFun_cancel=true;}} // 可以取消回调
+										] ;
+	 
+		 AE.OpenApp(ReqPar1);
+        
+		 
+ }
+
+ 
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit  barTender  </title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+      <style type="text/css">
+        html,body{
+            height: 100%;
+	      width:100%
+        }
+    body{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+     <div style="font-size:10px">1 .barTender
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value=''/>
+		   	<button type="button" id="btn_Flash" onclick="input_App() " >do it</button>&nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp;&nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed  </a> &nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a> &nbsp; &nbsp;<a href="index.html" target="_blank">index</a> 
+		    
+			</div><button type="button" id="btn2" onclick="open_get() " > 打开获取反馈</button>  
+          <div style="font-size:10px"> 2.打开网络   <button type="button" id="btn2" onclick="open_webfile() " > 网络文件</button>                                                                                            
+	
+ 
+   <button type="button" id="btn2" onclick="UploadFile() " >推荐手动上传</button>   </div>
+     <div>  <button type="button" id="btn2" onclick="cmd_runcode() " >3 运行命令，打印，反馈</button>   </div>
+   
+     <button type="button" id="btn2" onclick='AE.OpenApp({"emit":"close","Obj":"barTender","AppId":1,"par":{"AppMethod":"POST"}}) ' >关闭</button> 
+   
+     <div style="font-size:10px">  close : {"emit":"close","Obj":"barTender","AppId":1}       or     {"emit":"closeAll","Obj":"barTender"}  </div>
+</div>
+
+ <div   id="AppEmbed1"  style="border:none; 	width:720px;height:520px" ></div>
+	 
+ 
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+/**
+ 
+
+   1 默认barTender的"progId":   progId="BarTender.Application" ，或者指定版本2020版本  "BarTender.Application.11"  {B9425246-4131-11D2-BE48-004005A04EDF}
+      全局变量 对象  AppJsObject     AppJsObject.objName 访问实例对象,默认barTender ，则为 AppJsObject.barTender （ Application）访问
+	  活动文档	  AppJsObject.barTender.ActiveFormat
+	  默认打开文档命名为 AppJsObject.barTender.btFormat
+    2  默认comType:1 创建App。 0获取已有，2获取或者创建。关闭网页时候，关闭APP，除非定义  No_Quit_FreeLibrary:1。
+	
+	 barTender二次开发技术基础  http://help.seagullscientific.com/2021/en/#../Subsystems/ActiveX/Content/Save_Method_(Application).htm
+*/
+  /////////////方法1 ATL 方式打开com组件/
+ var  local_src=["demo/htmlDemo/file/bt1.btw"]
+ var web_src=[["https://cdn.jsdelivr.net/gh/appemit/AppemitWeb@master/docs/demo/file/bt1.btw","bt1.btw"]]
+ 
+	    var init_mark=  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&flag=1");
+ 
+ 	//barTender
+ 	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+		  
+ 	 
+	   	   AE.OpenApp(ReqPar);
+  }
+ 
+/////////////1  打开 获取反馈/////////////////////////////////////////
+//  执行顺序"init"   -> OpenFile("src") ->  "loaded"-> ...-> "destroy" ->(没有AppJsObject了)->  "closed"
+
+ var  open_get= function(Jdata){    //回调的数据Jdata
+        
+	      var ReqPar1={"emit":"open","Obj":"barTender","AppType":1,"AppFollow":31
+		                       ,"src":local_src     //设置了src 则会Read然后Open
+							   ,"pos":1
+		                      , "par":{"objName":"barTender","HttpPost":null,"show_UpdateTool":true,"AppMethod":"POST" } //barTender必须要"AppMethod":"POST" 方式传递消息
+							  ,"par0":{"noCaption":28  //嵌入时默认去掉标题栏高度，0保留
+							              , "embed": 1          //默认1嵌入  -1浮动，   0独立
+							              , "AppStep":{"init":null, "destroy":null, "closed":null
+										  ,"loaded":"   if (AppJsObject.barTender) {return {FileName:AppJsObject.barTender.ActiveFormat.FileName};}"}  // 
+                 				  //默认打开AppJsObject.barTender.btFormat， 有数值则认执行 btFormat 以下参数 
+										//  ,"SpecifyLabelFormatPassword":"**"
+										 // ,"AvailableTemplateFieldNames":{"a":1}
+										  //,"NamedSubStringValue":{"a":1,"b":1,"c":1}    //设置某个特定的SubString的值
+										 // ,"IdenticalCopiesOfLabel":1         //设置同序列打印的份数
+										// , "NumberSerializedLabels":5                // //设置需要打印的序列数
+										 //  ,"Command":"/f=.... /p"                  调用CommandLine
+										 //  ,"Printer":""            //指定要使用的打印机，如"Microsoft Print to PDF"，默认为系统指定的默认打印机
+										 // ,"Prompt":{"a":1}   //  打印提示的值
+										  // ,"Prompts":{"Text Input Box Control 1;New Value 1;Text Input Box Control 2;New Value 2", ";"}
+										  //,"PrintOut":{false,false}
+										 //,"Save":false/true
+										 //,"SaveAs":"path"
+										  }  
+							 
+							  }
+
+		  
+ 	 
+	   	   AE.OpenApp(ReqPar1);
+  }
+  
+  
+ 
+ //2  打开网络文件/////////////////////////
+ var open_webfile= function(Jdata){    //回调的数据Jdata
+        
+	      var ReqPar2={};
+	       ReqPar2={"emit":"open","Obj":"barTender","AppType":1,"AppFollow":31
+		                       ,"src":web_src     //设置了src 则会Read然后Open
+							   ,"pos":1
+		                      , "par":{"objName":"barTender","HttpPost":null,"show_UpdateTool":true,"AppMethod":"POST" } //HttpPost null 关闭时不自动上传.  HttpPost:{"URL":"http://eu.httpbin.org/post","valid":1}
+							  ,"par0":{"noCaption":28  //嵌入时默认去掉标题栏高度，0保留
+							           , "embed": 1          //默认1嵌入  -1浮动，   0独立
+							            //  , "AppStep":{"init":null, "destroy":null, "closed":null
+										// ,"loaded":"if (AppJsObject.barTender) {return {FileName:AppJsObject.barTender.ActiveFormat.FileName};}"
+										  }   
+ 
+							  }
+
+		  
+ 	 
+	   	   AE.OpenApp(ReqPar2);
+  }
+ 
+ 
+ /////////操作barTender对象//////////////////////////////////////////////
+ UploadFile=function(){
+  //上传 AppJsObject.barTender.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1}) //反馈code=200为成功
+ 
+ 	  var Req={"emit":"runCmd","Obj":"barTender","AppId":1,"codeStr":'AppJsObject.barTender.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1})' ,"par0":{}}   
+  
+      AE.OpenApp( Req );
+ 
+ }
+
+ 
+ 
+//发送命令
+ 
+cmd_runcode =function(){
+ //通过 AppJsObject.barTender 来调用来调用barTender Application,也可以定义一个 var barTender=AppJsObject.barTender; 用barTender来缩写也行
+
+   //注意 结尾一定要有;  或者\r\n 
+  //vue需要使用 AE.txt2code_Vue，目的是为了兼容IE不支持符号 `
+var	codeStr1 =   AE.txt2code(function(){/*!@preserve  
+  //Application 为 AppJsObject.barTender
+ // 默认打开文档命名为 AppJsObject.barTender.btFormat
+   AppJsObject.barTender.btFormat.PrintOut(false,true);
+ 
+  return {Visible:AppJsObject.barTender.Visible };    //反馈 
+*/});
+ 
+ 
+   var  Req3={"emit":"runCmd","Obj":"barTender","AppId":1,"codeStr":codeStr1,"par":{"AppMethod":"POST"} }   
+   
+  AE.OpenApp( Req3 );
+
+}
+
+
+ 
+
+/**
+ 
+ Name: Application
+ 
+ 
+ SetPreferredArrayType(对象 ,0xC ) = 设置调用该 COM 对象时 数组参数转 COM 数组的默认类型，\n参数只能设为 _VT_VARIANT 或 _VT_ILLEGAL,默认已设置为 _VT_ILLEGAL。\n此设置值会自动传递到该 COM 对象返回的其他 COM 对象。\n\n此选项设为 _VT_ILLEGAL 将自动调整为合适的类型,规则如下：\n纯字符串数组类型设为 _VT_BSTR,\n纯数值数组类型设为 _VT_R8（double），\n其他数组类型设为 _VT_VARIANT，\n这也是所有 COM 对象的默认设置。\n\n如果要创建明确指定 COM 类型的数组参数，\n可使用 com.Variant,COM.SafeArray,COM.SafeArrayV,com.int...等函数
+byte(__) = 定义数值类型为8位整数,兼容 .Net System.SByte 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+ubyte(__) = 定义数值类型为8位无符号整数,兼容 .Net System.Byte 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+word(__) = 定义数值类型为16位整数,兼容 .Net System.Int16 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+uword(__) = 定义数值类型为16位无符号整数,兼容 .Net System.UInt16 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+int(__) = 定义数值类型为32位整数,兼容 .Net System.Int32 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象,\n\n注意普通数值传入 COM 参数时，\n整数默认转为32位整数,小数默认按double类型处理
+uint(__) = 定义数值类型为32位无符号整数,兼容 .Net System.UInt32 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+long(__) = 定义数值类型为64位整数,兼容 .Net System.Int64 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+ulong(__) = 定义数值类型为64位无符号整数,兼容 .Net System.UInt64 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+float(__) = 定义数值类型为32位浮点数,兼容 .Net System.Single 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象
+double(__) = 定义数值类型为64位浮点数,兼容 .Net System.Double 类型数值,\n参数可以为数值或数组,返回 com.Variant 对象,\n\n注意普通数值传入 COM 参数时，\n整数默认转为32位整数,小数默认按double类型处理
+*/
+
+</script>
+</body>
+</html>

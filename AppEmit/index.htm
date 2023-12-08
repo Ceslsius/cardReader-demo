@@ -1,0 +1,709 @@
+<html>
+<head>
+<title>TEST</title>
+<body>
+<OBJECT classid=clsid:68DBF029-7F1B-4178-9C51-CA1FE5767D03 width=0 height=0 align="center" codebase="mtx_32.cab#version=1,0,0,1" id="mtx_32Ctrl" HSPACE=0 VSPACE=0>
+</OBJECT>
+</body>
+<center><h3> MT8_OCX控件演示网页 </h3></center>
+
+<fieldset>
+<legend>设备操作函数组</legend>
+<label>端口号：
+  <select name="devport" id="devport" >
+    <option value="0" SELECTED>COM1</option>
+    <option value="1">COM2</option>
+    <option value="2">COM3</option>
+    <option value="3">COM4</option>
+    <option value="4">COM5</option>
+  </select>
+</label>
+
+<label>波特率选择：
+  <select name="devbaud" id="devbaud">
+    <option value="115200" SELECTED>115200bps</option>
+    <option value="9600">9600bps</option>
+
+  </select>
+</label>
+</p>
+硬件版本号：
+<input type="text" name="Version" id="Version" maxlength="100" size="100" > 
+</p>
+产品序列号：
+<input type="text" name="Serial" id="Serial" maxlength="100" size="30"> 
+</p>
+蜂鸣次数：
+<input type="text" name="BeepNum" id="BeepNum" maxlength="10" size="5" value="1"> 
+句柄信息：
+<input type="text" name="DeviceHandle" id="DeviceHandle" maxlength="100" size="5" value="-1"> 
+</p>
+<form name="设备操作">
+<input type="button" onclick="javascript:DevOpen()" value="打开设备" >
+<input type="button" onclick="javascript:DevClose()" value="关闭设备" >
+<input type="button" onclick="javascript:DevBeep()" value="蜂鸣" >
+</form>
+</fieldset>
+
+</br>
+
+<fieldset>
+<legend>操作工具函数组</legend>
+转换数据：
+<input type="text" name="WriteDataASCHEX" id="WriteDataASCHEX" maxlength="3000" size="85" value="3030313132323333343435353636"> 
+</p>
+转换结果：
+<input type="text" name="ReadDataASCHEX" id="ReadDataASCHEX" maxlength="3000" size="85"> 
+</p>
+<form name="ASCHEX操作">
+<input type="button" onclick="javascript:AscHex()" value="ASC码转HEX码" >
+<input type="button" onclick="javascript:HexAsc()" value="HEX码转ASC码" >
+</form>
+</fieldset>
+
+</br>
+
+<fieldset>
+<legend>操作Eeprom函数组</legend>
+地址：
+<input type="text" name="AddressEeprom" id="AddressEeprom" maxlength="10" size="5" value="0"> 
+长度：
+<input type="text" name="LengthEeprom" id="LengthEeprom" maxlength="10" size="5" value="200">
+</p>
+写入数据：
+<input type="text" name="WriteDataEeprom" id="WriteDataEeprom" maxlength="3000" size="65" value="00112233445566778899AABBCCDDEEFF"> 
+</p>
+读出数据：
+<input type="text" name="ReadDataEeprom" id="ReadDataEeprom" maxlength="3000" size="65"> 
+</p>
+<form name="EEPROM操作">
+<input type="button" onclick="javascript:DevReadeeprom()" value="读Eeprom" >
+<input type="button" onclick="javascript:DevWriteeeprom()" value="写Eeprom" >
+</form>
+</fieldset>
+</br>
+
+<fieldset>
+<legend>操作接触式CPU卡函数组</legend>
+<label>COS指令：
+  <select name="coscpu" id="coscpu" onchange="cpumycos()">
+    <option value="0" SELECTED>取随机数08</option>
+    <option value="1">选择MF</option>
+  </select>
+</label>
+
+<label>卡座选择：
+  <select name="cardno" id="cardno">
+    <option value="0" SELECTED>大卡座</option>
+    <option value="16">PSAM1</option>
+    <option value="17">PSAM2</option>
+    <option value="18">PSAM3</option>
+    <option value="19">PSAM4</option>
+  </select>
+</label>
+</p>
+写入数据：
+<input type="text" name="WriteDatacpu" id="WriteDatacpu" maxlength="3000" size="83" value="0084000008"> 
+</p>
+读出数据：
+<input type="text" name="ReadDatacpu" id="ReadDatacpu" maxlength="3000" size="83"> 
+</p>
+<form name="接触式CPU卡操作">
+<input type="button" onclick="javascript:SamSltReset()" value="上电复位" >
+<input type="button" onclick="javascript:CardApdu()" value="发送命令" >
+<input type="button" onclick="javascript:SamSltPowerdown()" value="卡片下电" >
+</form>
+</fieldset>
+
+</br>
+<fieldset>
+<legend>操作非接触式CPU卡函数组</legend>
+<label>COS指令：
+  <select name="cosdiscpu" id="cosdiscpu" onchange="discpumycos()">
+    <option value="0" SELECTED>取随机数08</option>
+    <option value="1">选择MF</option>
+  </select>
+</label>
+</p>
+CPU卡UID：
+<input type="text" name="UidCpu" id="UidCpu" maxlength="10" size="10" >
+</p>
+写入数据：
+<input type="text" name="WriteDataDiscpu" id="WriteDataDiscpu" maxlength="3000" size="83" value="0084000008"> 
+</p>
+读出数据：
+<input type="text" name="ReadDataDiscpu" id="ReadDataDiscpu" maxlength="3000" size="83"> 
+</p>
+<form name="非接触式CPU卡操作">
+<input type="button" onclick="javascript:OpenCard()" value="激活卡片" >
+<input type="button" onclick="javascript:FCardApdu()" value="发送命令" >
+<input type="button" onclick="javascript:RfHalt()" value="中止卡片" >
+</form>
+</fieldset>
+</br>
+
+<fieldset>
+<legend>操作M1卡函数组</legend>
+<label>密码类型：
+  <select name="keytypem1" id="keytypem1" >
+    <option value="0" SELECTED>A密码</option>
+    <option value="1">B密码</option>
+   </select>
+</label>
+密码：
+<input type="text" name="PwdM1" id="PwdM1" maxlength="12" size="20" value="FFFFFFFFFFFF"> 
+块地址：
+<input type="text" name="BlockM1" id="BlockM1" maxlength="130" size="5" value="10">  
+当前块值：
+<input type="text" name="NowValueM1" id="NowValueM1" maxlength="130" size="5" > 
+值操作：
+<input type="text" name="NewValueM1" id="NewValueM1" maxlength="3000" size="5" value="100"> 
+</p>
+卡片UID：
+<input type="text" name="UidM1" id="UidM1" maxlength="130" size="20"> 
+</p>
+写入数据：
+<input type="text" name="WriteDataM1" id="WriteDataM1" maxlength="3000" size="60" value="00112233445566778899AABBCCDDEEFF"> 
+</p>
+读出数据：
+<input type="text" name="ReadDataM1" id="ReadDataM1" maxlength="3000" size="60"> 
+</p>
+<form name="M1卡操作">
+<input type="button" onclick="javascript:RfCard()" value="寻卡" >
+<input type="button" onclick="javascript:RfAuthentication()" value="校验密码" >
+<input type="button" onclick="javascript:RfRead()" value="读数据" >
+<input type="button" onclick="javascript:RfWrite()" value="写数据" >
+<input type="button" onclick="javascript:RfInitval()" value="初始化块值" >
+<input type="button" onclick="javascript:RfReadval()" value="读块值" >
+<input type="button" onclick="javascript:RfIncrement()" value="加值" >
+<input type="button" onclick="javascript:RfDecrement()" value="减值" >
+<input type="button" onclick="javascript:RfHalt1()" value="中止卡片" >
+</form>
+</fieldset>
+
+</br>
+<fieldset>
+<legend>操作磁条卡函数组</legend>
+<label>磁条卡数据输出方式：
+  <select name="magneticmode" id="magneticmode" >
+    <option value="1" SELECTED>命令模式</option>
+    <option value="0">模拟键盘输入</option>
+   </select>
+</label> 超时时间：
+<input type="text" name="timsout" id="timsout" maxlength="10" size="10" value="10"> 
+</p>
+一磁道数据：
+<input type="text" name="track1" id="track1" maxlength="80" size="80" > 
+</p>
+二磁道数据：
+<input type="text" name="track2" id="track2" maxlength="50" size="50" > 
+</p> 
+三磁道数据：
+<input type="text" name="track3" id="track3" maxlength="170" size="170" > 
+</p>
+<form name="磁条卡操作">
+<input type="button" onclick="javascript:SetMagneticMode()" value="设置磁条卡输出模式" >
+<input type="button" onclick="javascript:MagneticRead()" value="命令模式读磁条卡" >
+</form>
+</fieldset>
+
+</br>
+<fieldset>
+<legend>操作二代证函数组</legend>
+</p>
+姓名：
+<input type="text" name="cardname" id="cardname" maxlength="30" size="30" > 
+</p>
+性别：
+<input type="text" name="sex" id="sex" maxlength="10" size="10" >
+民族：
+<input type="text" name="national" id="national" maxlength="10" size="10" > 
+</p>
+出生日期：
+<input type="text" name="birthday" id="birthday" maxlength="25" size="25"> 
+</p> 
+公民身份号码：
+<input type="text" name="number" id="number" maxlength="30" size="30"> 
+</p>
+住址：
+<input type="text" name="address" id="address" maxlength="60" size="60">
+</p>
+签发机关：
+<input type="text" name="IssuingAuthority" id="IssuingAuthority" maxlength="33" size="35"> 
+</p>
+有效期：
+<input type="text" name="validity" id="validity" maxlength="15" size="15"> 
+至
+<input type="text" name="validity2" id="validity2" maxlength="15" size="15"> 
+</p>
+身份证解析照片目录与文件名(如d:\\zp.jpg)
+注:c盘根目录可能会因为读写控制生成不了照片,但可手动建立下级文件夹来保存，如c:\\MT\\zp.jpg
+<input name="sft" id="sft" type="text" size="49" value="d:\\zp.jpg" > 
+照片：
+<img id="img" height="102" size="126"> 
+<form name="二代证操作">
+<input type="button" onclick="javascript:GetCardinfo()" value="读二代证信息" >
+</form>
+</fieldset>
+</br>
+
+<fieldset>
+<legend>读取金融IC卡卡号跟姓名</legend>
+<label>卡片类型：
+  <select name="CardType" id="CardType" >
+    <option value="0">接触式CPU卡</option>
+    <option value="255">非接触式CPU卡</option>
+   </select>
+</label>
+</p>
+卡号：
+<input type="text" name="ICCardNo" id="ICCardNo" maxlength="100" size="50" > 
+</p>
+姓名：
+<input type="text" name="ICCardName" id="ICCardName" maxlength="100" size="30"> 
+</p>
+<form name="金融IC卡操作">
+<input type="button" onclick="javascript:iReadICCardn()" value="读取金融IC卡卡号跟姓名" >
+</form>
+
+</fieldset>
+</br>
+<script language="javascript">
+	
+
+function DevOpen()//打开设备
+{
+        var port = document.getElementById('devport').value;	//获取下拉框当前选值
+        var baud = document.getElementById('devbaud').value;	//获取下拉框当前选值
+	var st = mtx_32Ctrl.DeviceOpen(port,baud);
+	if((st == 0 || st < 0) && mtx_32Ctrl.lErrorCode != 0)
+	{
+		Version.value = "";
+		Serial.value = "";
+		DeviceHandle.value = "-1";
+		alert("打开设备失败，错误码为：" + st);
+	}
+	else
+	{
+		DeviceHandle.value = st;
+		var sver = mtx_32Ctrl.DeviceVersion(DeviceHandle.value,1);
+		if(mtx_32Ctrl.lErrorCode == 0)
+			Version.value = sver;
+		else
+			Version.value = "";
+			
+		var snr = mtx_32Ctrl.DeviceReadsnr(DeviceHandle.value,20);
+		if(mtx_32Ctrl.lErrorCode == 0)
+			Serial.value = snr;
+		else
+			Serial.value = "";
+		alert("打开设备成功");
+	}
+}
+
+function DevClose()//关闭设备
+{
+	var ret = mtx_32Ctrl.DeviceClose(DeviceHandle.value);
+	Version.value = "";
+	Serial.value = "";
+	DeviceHandle.value = "-1";
+	if(ret == 0)
+		alert("关闭设备成功");
+	else
+		alert("关闭设备失败，错误码为：" + ret);
+}
+
+function DevBeep()//蜂鸣器蜂鸣
+{
+	var ret = mtx_32Ctrl.DeviceBeep(DeviceHandle.value,1285,BeepNum.value);
+	if(ret == 0)
+		alert("设备蜂鸣成功");
+	else
+		alert("设备蜂鸣失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+//----------------------------------------------------------		工具函数		-----------------------------------------------//
+
+//asc_hex
+function AscHex()
+{
+	var ret = mtx_32Ctrl.AscHex(WriteDataASCHEX.value,WriteDataASCHEX.value.length/2);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		ReadDataASCHEX.value = ret;
+		alert("ASC码转HEX码成功");
+	}
+	else
+	{
+		ReadDataASCHEX.value = "";
+		alert("ASC码转HEX码失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+//hex_asc
+function HexAsc()
+{
+	var ret = mtx_32Ctrl.HexAsc(WriteDataASCHEX.value,WriteDataASCHEX.value.length);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		ReadDataASCHEX.value = ret;
+		alert("HEX码转ASC码成功");
+	}
+	else
+	{
+		ReadDataASCHEX.value = "";
+		alert("HEX码转ASC码失败，错误码为：" + CZx_32Ctrl.lErrorCode);
+	}
+}
+
+//----------------------------------------------------------		eeprom操作		------------------------------------------------//
+// 说明： 读设备备注区（总长200字节）
+// 调用：icdev: 通讯设备标识符
+// offset: 备注区偏移地址0～199	
+// len: 读出信息长度1～200	 
+// 	 *data_buffer: 存放读出的备注信息	 
+// 	 返回：<0 错误	 
+// 	 =0 正确
+function DevReadeeprom()
+{
+	var ret = mtx_32Ctrl.DevReadeeprom(DeviceHandle.value,AddressEeprom.value,LengthEeprom.value);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		ReadDataEeprom.value = ret;
+		alert("读设备Eeprom成功");
+	}
+	else
+	{
+		ReadDataEeprom.value = "";
+		alert("读设备Eeprom失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+// 说明： 写设备备注区（总长200字节）
+// 调用： icdev: 通讯设备标识符
+// offset: 备注区偏移地址0～199		
+// len: 写入信息长度1～200	 
+// 	 *data_buffer: 写入信息	 
+// 	 返回：<0 错误	 
+// 	 =0 正确	
+//写入的是ASC字符，如果要写16进制数据可以使用AscHex转换函数转换之后再写入，长度为16进制数据长度
+function DevWriteeeprom()
+{
+	var ret = mtx_32Ctrl.DevWriteeeprom(DeviceHandle.value,AddressEeprom.value,LengthEeprom.value,WriteDataEeprom.value);
+	if(ret == 0)
+		alert("写设备Eeprom成功");
+	else
+		alert("写设备Eeprom失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+//----------------------------------------------			接触CPU卡操作		-----------------------------------------------//
+//根据COS指令下拉框选择来改变写入数据内容
+function cpumycos()
+{
+	var scos = document.getElementById('coscpu').value;	//获取下拉框当前选值
+	if(scos == 0)
+		WriteDatacpu.value = "0084000008";
+	else if(scos == 1)
+		WriteDatacpu.value = "00a40000023f00";
+}
+
+function SamSltReset()//卡片上电复位
+{
+        var cpucardno = document.getElementById('cardno').value;
+	var st = mtx_32Ctrl.SamSltReset(DeviceHandle.value,0,cpucardno);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		ReadDatacpu.value = mtx_32Ctrl.retdata;
+		alert("卡片复位成功");
+	}
+	else
+	{
+		ReadDatacpu.value = "";
+		alert("卡片复位失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+function CardApdu()//发送命令
+{
+        var cpucardno = document.getElementById('cardno').value;
+        var slen = document.getElementById("WriteDatacpu").value.length;
+	var st = mtx_32Ctrl.CardApdu(DeviceHandle.value,cpucardno,slen,WriteDatacpu.value);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		ReadDatacpu.value = mtx_32Ctrl.cardrecdata;
+		alert("发送命令成功");
+	}
+	else
+	{
+		ReadDatacpu.value = "";
+		alert("发送命令失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+function SamSltPowerdown()//卡片下电
+{
+        var cpucardno = document.getElementById('cardno').value;
+	var st = mtx_32Ctrl.SamSltPowerdown(DeviceHandle.value,cpucardno);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		alert("卡片下电成功");
+	}
+	else
+	{
+		ReadDatacpu.value = "";
+		alert("卡片下电失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+//----------------------------------------------			非接CPU卡操作		-----------------------------------------------//
+//根据COS指令下拉框选择来改变写入数据内容
+function discpumycos()
+{
+	var ncos = document.getElementById('cosdiscpu').value;	//获取下拉框当前选值
+	if(ncos == 0)
+		WriteDataDiscpu.value = "0084000008";
+	else if(ncos == 1)
+		WriteDataDiscpu.value = "00a40000023f00";
+}
+
+function OpenCard()//激活卡片
+{
+	var snr = mtx_32Ctrl.CardOpen(DeviceHandle.value,0);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+                UidCpu.value=snr;
+		ReadDataDiscpu.value = mtx_32Ctrl.recatr;
+		alert("激活卡片成功");
+	}
+	else
+	{
+		ReadDataDiscpu.value = "";
+		alert("激活卡片失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+function FCardApdu()//发送命令
+{
+        var slen = document.getElementById("WriteDataDiscpu").value.length;
+	var st = mtx_32Ctrl.CardApdu(DeviceHandle.value,255,slen,WriteDataDiscpu.value);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		ReadDataDiscpu.value = mtx_32Ctrl.cardrecdata;
+		alert("发送命令成功");
+	}
+	else
+	{
+		ReadDataDiscpu.value = "";
+		alert("发送命令失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+function RfHalt()
+{
+	var ret = mtx_32Ctrl.RfHalt(DeviceHandle.value,0);
+	if(ret == 0)
+		alert("中止卡成功");
+	else
+		alert("中止卡失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+//----------------------------------------------			M1卡操作			-----------------------------------------------//
+function RfCard()
+{
+	var ret = mtx_32Ctrl.RfCard(DeviceHandle.value,0);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		UidM1.value = ret;
+external.emitBack('{"data": "' + ret + '", "from": "MT8" , "type" : "uidM1"}')
+		alert("寻卡成功");
+	}
+	else
+	{
+		UidM1.value = "";
+		alert("寻卡失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+function RfAuthentication()
+{
+	var keytype = document.getElementById('keytypem1').value;	//获取下拉框当前选值
+	//var ret = mtx_32Ctrl.RfAuthentication(DeviceHandle.value,keytype,BlockM1.value/4,PwdM1.value);
+	var ret = mtx_32Ctrl.RfAuthentication(DeviceHandle.value,keytype,BlockM1.value,PwdM1.value);
+	if(mtx_32Ctrl.lErrorCode == 0)
+		alert("校验密码成功");
+	else
+		alert("校验密码失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+function RfRead()
+{
+	var ret = mtx_32Ctrl.RfRead(DeviceHandle.value,BlockM1.value);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		ReadDataM1.value = ret;
+		alert("读数据成功");
+	}
+	else
+	{
+		ReadDataM1.value = "";
+		alert("读数据失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+function RfWrite()
+{
+	var ret = mtx_32Ctrl.RfWrite(DeviceHandle.value,BlockM1.value,WriteDataM1.value);
+	if(ret == 0)
+		alert("写数据成功");
+	else
+		alert("写数据失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+function RfInitval()
+{
+	var ret = mtx_32Ctrl.RfInitval(DeviceHandle.value,BlockM1.value,NewValueM1.value);
+	if(ret == 0)
+		alert("初始化值成功");
+	else
+		alert("初始化值失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+function RfReadval()
+{
+	var ret =mtx_32Ctrl.RfReadval(DeviceHandle.value,BlockM1.value);
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		NowValueM1.value = ret;
+		alert("读值成功");
+	}
+	else
+	{
+		NowValueM1.value = "";
+		alert("读值失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+	}
+}
+
+function RfIncrement()
+{
+	var ret = mtx_32Ctrl.RfIncrement(DeviceHandle.value,BlockM1.value,NewValueM1.value);
+	if(ret == 0)
+		alert("加值成功");
+	else
+		alert("加值失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+function RfDecrement()
+{
+	var ret = mtx_32Ctrl.RfDecrement(DeviceHandle.value,BlockM1.value,NewValueM1.value);
+	if(ret == 0)
+		alert("减值成功");
+	else
+		alert("减值失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+function RfHalt1()
+{
+	var ret = mtx_32Ctrl.RfHalt(DeviceHandle.value,0);
+	if(ret == 0)
+		alert("中止卡成功");
+	else
+		alert("中止卡失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+//----------------------------------------------			磁条卡操作函数				-----------------------------------------//
+function SetMagneticMode()
+{
+	var nmode = document.getElementById('magneticmode').value;	//获取下拉框当前选值
+	var st = mtx_32Ctrl.SetMagneticMode(DeviceHandle.value,nmode);
+	if(mtx_32Ctrl.lErrorCode == 0)
+		alert("设置磁条刷卡模式成功");
+	else
+		alert("设置磁条刷卡模式失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+function MagneticRead()
+{
+	var st = mtx_32Ctrl.MagneticRead(DeviceHandle.value,timsout.value);
+	if(mtx_32Ctrl.lErrorCode == 0)
+        {
+                track1.value =mtx_32Ctrl.track1data;
+                track2.value =mtx_32Ctrl.track2data;
+                track3.value =mtx_32Ctrl.track3data;
+		alert("磁条刷卡成功");
+        }
+	else
+		alert("磁条刷卡失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+}
+
+//----------------------------------------------			二代身份证操作函数			-----------------------------------------//
+//设置照片存储路径
+var t = 0;
+function GetCardinfo()
+{
+
+	if(sft.value == "")
+	{
+		alert("照片解析目录不能为空");
+		return;
+	}
+
+	var ret = mtx_32Ctrl.IDCardGetCardInfo(DeviceHandle.value,sft.value);
+        if(mtx_32Ctrl.lErrorCode == 0)
+        {
+               cardname.value =mtx_32Ctrl.idname;
+               sex.value =mtx_32Ctrl.idsex;
+               national.value =mtx_32Ctrl.idnation;
+               birthday.value =mtx_32Ctrl.idborthday;
+               number.value =mtx_32Ctrl.resultid;
+               address.value =mtx_32Ctrl.idaddress;
+               IssuingAuthority.value =mtx_32Ctrl.idissuingauthority;
+               validity.value =mtx_32Ctrl.idinvaliddate;
+               validity2.value =mtx_32Ctrl.idinvaliddate2;
+	           document.getElementById('img').src = "";	
+	           document.getElementById('img').src=sft.value + "?t=" + t;
+			   if(t == 10000)
+			   {
+			      t = 0;
+			   }
+			   else
+			   {
+			      t = t + 1;
+			   }
+               alert("读二代证成功");
+        }
+        else{
+		       cardname.value = "";
+               sex.value = "";
+               national.value = "";
+               birthday.value = "";
+               number.value = "";
+               address.value = "";
+               IssuingAuthority.value = "";
+               validity.value = "";
+               validity2.value = "";
+			   sft.value = "";
+				document.getElementById('img').src = "";	
+	       
+               
+               alert("读二代证失败，错误码为：" + mtx_32Ctrl.lErrorCode);
+			}
+}
+
+function iReadICCardn()
+{
+	var ret = mtx_32Ctrl.readiccardidandname(DeviceHandle.value, CardType.value);
+	ICCardNo.value = mtx_32Ctrl.iccardid;
+	ICCardName.value = mtx_32Ctrl.iccardname;
+	
+	if(mtx_32Ctrl.lErrorCode == 0)
+	{
+		alert("读取金融IC卡卡号和姓名成功");
+	}
+	else
+		alert("读取金融IC卡卡号和姓名，错误信息为：" + mtx_32Ctrl.iccarderrmsg);
+}
+
+</script>
+     
+</head> 
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+  <html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content="Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ 
+  <link rel="stylesheet" href="../layui/css/layui.css">
+ <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+    <style type="text/css">
+  .Appboxs {   // 会自动缩放
+  margin-top:10px; display: -webkit-box;     display: -moz-box;  display: -ms-flexbox;  display: -webkit-flex;display: flex; display: box;  display: flexbox;  justify-content:space-around;
+}
+</style>  
+</head>
+<body>
+ 
+<!-- 你的HTML代码 -->
+       <div id="cs" name="ces1" style=" margin-left:3200px; margin-top:1200px;text-align:center ">
+			     测试滚动 
+		</div>  
+<script src="../layui/layui.js"></script>
+
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  <!-- 先引用 -->
+<script>
+ 
+ var  contentStr =   AE.txt2code(function(){/*!@preserve
+<div class="container">
+            12345
+         <div class="Appboxs" >
+ 		     <div id="AppEmbed1"  style=" border: solid 3px #F0F0F0; min-width:30px;min-height:20px;width:350px;height:350px" ></div>
+			 <div id="AppEmbed2"  style=" border: solid 3px #F0F0F0; min-width:30px;min-height:20px;width:350px;height:350px" ></div>
+		</div>
+</div>
+  
+ 
+*/});
+ 
+ 
+///////////修正 fixed=ture  offset: 'auto'  F12出现console的情况以及windowresize更新后layer延迟auto///////////////////////////////// 
+  var targetNode ;
+ var targetNode_oldOffset={"left":0,"top":0};
+ var observer;
+// MozMutationObserver是优化代码
+var fixedOffsetAuto_callback = function(mutationsList, observer) {
+	// Use traditional 'for loops' for IE 11
+	for(  k in mutationsList) {
+		   if (mutationsList[k].type === 'attributes' && mutationsList[k].target.className==targetNode.getAttribute("className")  ) {
+ 
+			 if (targetNode_oldOffset.left!=mutationsList[k].target.offsetLeft || targetNode_oldOffset.top!=mutationsList[k].target.offsetTop) {
+		 		 targetNode_oldOffset.left =mutationsList[k].target.offsetLeft; targetNode_oldOffset.top =mutationsList[k].target.offsetTop;
+			    //修正  fixed=ture  offset: 'auto' F12调试窗口改变时的情况  
+		 			 AE.AppPosEvent("move",{},1,AE.EVENTTYPE["move"]);
+            
+			 }
+ 
+		}
+	}
+};
+
+
+ ///////////////////////////////////	  //反馈接口与AE.callbackFunc.equ相等后执行对应的函数，当websocket打开, 再执行AE.callbackFunc.func
+       var  input_App=function(){
+	        var ReqPar= [{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"htmlStr":null,"HttpServer_startUrl":null,"URL":"http://www.baidu.com"}, "par0":{"header":null,"noScriptErr":true,"UIFLAG":null,"DLCTL":null,"userAgent":null,"crossDomain":true,"rightMenu":-1,"show_UpdateTool":true    }}
+			    ,{"emit":"open","Obj":"web","AppType":1,"AppId":2,"pos":1,"par":{"htmlStr":null,"HttpServer_startUrl":null,"URL":"http://www.baidu.com"} }
+			];
+           AE.OpenApp(ReqPar);
+       }
+	       
+      AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":input_App}   ] ;//连接websocket成功后，执行input_App
+ 
+ //////////首先连接好 websocket一次,没有必要每次弹窗都执行InitApp///////////////////////
+   AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");    //启动websocket 
+   
+//////////////////////////////////
+   
+ var  layer_fixed=true;   //true = position: absolute;    false= position:  relative
+ 
+layui.use(['layer', 'form'], function(){
+  var layer = layui.layer
+  ,form = layui.form;
+  
+  layer.open({
+	  type: 1
+	   ,title: '当你选择该窗体时，即会在最顶端'
+	   ,offset: 'auto'   // ['80px', '400px']
+         ,area: ['800px', '500px']
+        ,shade: 0
+	  ,fixed: layer_fixed
+	 //,move: false
+ 
+	 // ,content: ['iframe_in.html', 'no'] //这里content是一个URL，如果你不想让iframe出现滚动条，你还可以content: ['http://www.baidu.com', 'no']
+	 ,content: contentStr
+	 ,success: function(layero, index){
+	     
+	 if (!layer_fixed) {
+	      AE.absolutePos=$(layero.selector).offset();     //使用了相对位置但是固定不动，需要修正
+	 }else{
+		AE.fixedPos_NoPageOffset=true;  // 固定则  不计算PageOffset
+		AE.AppFollow=30;                     // 固定则不响应滚动事件,全部响应默认31
+		// fixed=ture  offset: 'auto'  F12出现console的情况以及windowresize更新后layer延迟auto  ,MozMutationObserver是优化代码
+		 var MutationObserver = window.MutationObserver || window.webkitMutationObserver || window.MozMutationObserver;
+         observer = new MutationObserver(fixedOffsetAuto_callback);
+	   targetNode = document.getElementById( (layero.selector).substring(1, layero.selector.length));    //"layui-layer1"
+	   //console.log(targetNode);  
+       observer.observe(targetNode, { attributes: true, childList: false, subtree: false });
+    }
+ 
+       
+      }
+	 ,cancel: function(index, layero){ 
+	      AE.CloseApp({});   //关闭当前所有App   ， 指定AppId则关闭对应的
+		 if (observer) observer.disconnect();  //关闭监控
+	  }
+	 , moveEnd: function(layero){
+	 
+	      if (!layer_fixed) AE.absolutePos=$(layero.selector).offset();     //使用了相对位置但是固定不动，需要修正
+	     AE.AppPosEvent("move",{},1,AE.EVENTTYPE["move"]);    //更新所有App位置,执行move事件
+	 }
+	 ,resizing: function(layero){
+        if (!layer_fixed) AE.absolutePos=$(layero.selector).offset();     //使用了相对位置但是固定不动，需要修正
+	  
+	     AE.AppPosEvent("resize",{},1,AE.EVENTTYPE["resize"]);    //更新所有App位置,执行resize事件
+    }  
+	 
+	}); 
+});
+ 
+
+
+	   
+
+    
+</script> 
+</body>
+</html>

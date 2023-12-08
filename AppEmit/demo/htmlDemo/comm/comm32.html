@@ -1,0 +1,79 @@
+ <!DOCTYPE html>
+ <html>
+<head>
+
+<title>Test mscomm</title>
+<script>
+ // window.onlοad=function(){alert(1);}  //o有问题
+ window.onload=function(){
+  console.log(20)
+ document.all.MSComm1.PortOpen = true;
+   console.log(22)
+ }
+ 
+ //new ActiveXObject
+ function doPrint(printmsg){ 
+ console.log(1,printmsg)
+ document.all.MSComm1.Output = printmsg + "\r\n" + "\r\n" + "\r\n" + "\r\n"; 
+  console.log(2,printmsg)
+ }
+ function pageEnd(){  
+ document.all.MSComm1.PortOpen = false;
+ }
+ 
+ function MSComm1_OnComm()    {    
+	var len=0;    
+	if(MSComm1.CommEvent==1)//如果是发送事件    
+	{    
+		window.alert("请读条码");//这句正常，说明发送成功了    
+	}    
+	else if(MSComm1.CommEvent==2)//如果是接收事件    
+	{    
+			document.txtReceive.value=  MSComm1.Input;    
+	}    
+
+} 
+/*
+{"emit":"open","Obj":"comm","AppType":2,"AppShow":false,"par":{"objName":"mscomm1","Port":"COM1","BaudRate":"9600","ByteSize":"8","Parity":"none","StopBits":"1"},"par0":{"Send_AsciiHex":"Ascii","Recv_AsciiHex":"Ascii"}}
+{"emit":"open","Obj":"comm","AppType":2,"AppShow":false,"par":{"objName":"mscomm1","Port":"COM1","BaudRate":"9600","ByteSize":"8","Parity":"none","StopBits":"1"},"par0":{ }}
+ {"emit":"send","Obj":"comm","AppType":2,"AppId":1,"data":"可以,第1，from mscomm1 ","par0":{"Send_AsciiHex":"Hex","toFormat":"Hex"}}
+{"emit":"runCmd","Obj":"comm","AppType":2,"AppId":1,"codeStr":"AppJsObject.mscomm1.ouput('mscomm1动态写入ascii数据1')"}
+
+
+*/
+
+
+</script>
+</head>
+
+<body >
+ 
+ <p><textarea rows="21" id="textarea"  cols="86"></textarea></p>
+  <p><button onclick='doPrint(document.all.textarea.value)'>Print</button></p>
+ 
+ <p><OBJECT id="MSComm1" CLASSID="clsid:648A5600-2C6E-101B-82B6-000000000014" 
+ codebase="D:\work\soft_private\DLLAvtive\AppEmit\plugins\common\comm\mscomm32.ocx" type="application/x-oleobject" style="display:none" >    
+ 
+
+  <param name="CommPort" value="1">
+  <param name="DTREnable" value="1">
+  <param name="Handshaking" value="0">
+  <param name="InBufferSize" value="1024">
+  <param name="InputLen" value="0">
+  <param name="NullDiscard" value="0">
+  <param name="OutBufferSize" value="512">
+  <param name="ParityReplace" value="?">   
+  <param name="RThreshold" value="0">
+  <param name="RTSEnable" value="0">
+  <param name="BaudRate" value="9600">
+  <param name="ParitySetting" value="0">
+  <param name="DataBits" value="8">
+  <param name="StopBits" value="0">
+  <param name="SThreshold" value="0">
+  <param name="EOFEnable" value="0">
+  <param name="InputMode" value="0">
+ </object></p>
+ <input type="text" name="txtReceive" size=50 value="">   
+ 
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit dll ocx ActiveX</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ <!--  <script src="https://cdn.jsdelivr.net/npm/js-base64@3.2.4/base64.min.js"></script>  -->
+ 
+      <style type="text/css">
+        html,body{
+            height: 100%;
+	      width:100%
+        }
+    body{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+     <div style="font-size:10px"> 2.可视化com组件 
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"card","AppShow":false,"src":[],"par":{"objName":"synCard2","port":1,"plugins": null},"par0":{"AppMethod":"msg Synchronization component need set: POST" }}'/>
+		   	<button type="button" id="btn_Flash" onclick="start_App() " >do it</button> &nbsp; &nbsp; 
+			<button type="button" id="btn_Flash" onclick="do_App() " >调用函数测试</button> &nbsp; &nbsp; 
+				<button type="button" id="btn_Flash" onclick="do_App2() " >运行代码测试</button> &nbsp; &nbsp; 
+		   </div>  
+ 
+ 
+ <div readonly id="AppEmbed1"  style="border:none; 	width:100%;height:100%" ></textarea>
+	 
+  
+
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+/**步骤
+ // 1. AE.InitApp  连接ws
+ // 2.AE.OpenApp  打开app dll
+  //3. AE.OpenApp  调用发送命令
+  //4. 结束时一定需要正常退出,调用 的dll需要 stop或者null或者销毁
+**/
+ 
+	  var init_mark=  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");  //flag=1 调试环境
+	 
+ 
+	var start_App= function(){
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+		 
+	   	   AE.OpenApp(ReqPar);
+		    
+	    
+	   }
+	// 1函数调用   
+  var do_App=function(){
+    //调用synCard2的方法add2，输入参数3
+   		var  ReqPar={"emit":"runCall","Obj":"card","AppId":1,"AppShow":false,"src":[],"par":{"objName":"synCard2","plugins": null},"par0":{"callFun":{"add2":[3,2]}  }}	   
+		AE.OpenApp(ReqPar);
+}
+  
+		// 2代码运行调用    
+  var do_App2=function(){
+    
+var codeStr =   AE.txt2code(function(){/*!@preserve
+ var sum=AppJsObject.synCard2.add2(5,10);
+return  sum; 
+*/});
+ 
+      var Req={"emit":"runCmd","Obj":"card","AppId":1,"codeStr":codeStr }    //都支持
+
+	   AE.OpenApp(Req);
+ }
+ 
+ // setTimeout(   function(){AE.OpenApp({"emit":"runCall","Obj":"app","par":{"objName":"AppJsFun","callFun": {"msgbox":["调用msgbox","title"]}}})}	,2000)
+ 
+ 
+  
+  /**
+  synCard2引入的插件如下，调用的方法以及定义如下
+//\plugins\thirdparty\card\synCard2
+  
+     open = function(){
+        this.opened = api.Syn_OpenPort(this.port) == 0;
+        return this.opened;
+    };
+    close = function(){
+        if( this.opened ){
+            if(  api.Syn_ClosePort(this.port) == 0 ){
+                this.opened = false;
+                return true;
+            }
+        }
+    };
+ 
+    add2=function(a,b){   //测试
+        b:=0;
+    	return a+b; 
+    };
+	
+    msg=function(a){
+        import win;
+    	win.msgbox(a);
+    } ;   
+    setPhotoName = function(iType,name){
+        if( name ) return api.SetPhotoNameEx(iType,..string.fromto(name) );
+        return 0 == api.Syn_SetPhotoName(iType);
+    };
+    setPhotoType = function(iType){
+        return 0 == api.Syn_SetPhotoType(iType);
+    };
+    setPhotoPath = function(path){
+        if(path) ..io.createDir(path);
+        return 0 == api.Syn_SetPhotoPath(2,..string.fromto(..io.fullpath(path),65001,0) );
+    };
+    setSexType = function(iType){
+        return 0 == api.Syn_SetSexType(iType);
+    };
+    setNationType = function(iType){
+        return 0 == api.Syn_SetNationType(iType);
+    };
+    findCard = function(){
+        var iin = {BYTE v[4] }
+        if( 0 == api.Syn_StartFindIDCard(this.port,iin,!this.opened ) ){
+            return iin.v;
+        }
+    };
+    selectCard = function(){
+        var sn = {BYTE v[4] }
+        if( 0 == api.Syn_SelectIDCard(this.port,sn,!this.opened ) ){
+            return sn.v;
+        }
+    };
+    readMsg = function(){ 
+        var cardData = IDCardData();
+        var err = api.Syn_ReadMsg(this.port,!this.opened,cardData);
+        if( err==0 ) || (err==1){
+        
+            for(k,v in cardData) 
+                cardData[k] = ..string.fromto(v,0,65001,-1);
+                
+            cardData.err = err;
+            return cardData;
+        }
+        return null,err;
+    }
+    readFpMsg = function(){ 
+        var cardData = IDCardData();
+        var fingerprint  = ..raw.buffer(0x104);
+        var err = api.Syn_ReadFPMsg(this.port,!this.opened,cardData,fingerprint);
+        if( err==0 ) || (err==1){
+        
+            cardData.fingerprint = fingerprint;
+            for(k,v in cardData) 
+                cardData[k] = ..string.fromto(v,0,65001,-1);
+                
+            cardData.err = err;
+            return cardData;
+        }
+        return null,err;
+    }
+	
+	IDCardData {
+        byte name[32];//姓名 
+        byte sex[6];//性别
+        byte nation[20];//名族
+        byte born[18];//出生日期
+        byte address[72];//住址
+        byte idCardNo[38];//身份证号
+        byte grantDept[32];//发证机关
+        byte userLifeBegin[18];// 有效开始日期
+        byte userLifeEnd[18];// 有效截止日期
+        byte reserved[38];// 保留
+        byte photoFileName[255];// 照片路径
+    }
+ **/
+	
+
+</script>
+</body>
+</html>

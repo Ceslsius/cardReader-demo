@@ -1,0 +1,201 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit  office word/excel/PPT/PDF</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+      <style type="text/css">
+        html,body{
+            height: 100%;
+	      width:100%
+        }
+    body{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+     <div style="font-size:10px">(?file=1 -> pdf )&nbsp; 2.local word  
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"office","AppType":1,"AppFollow":31,"src":"/demo/htmlDemo/file/d1.docx","pos":1,"par0":{"embed":-1, "HttpPost":{"URL":"http://eu.httpbin.org/post","valid":0,"fileName":"s1.docx"},"show_UpdateTool":true}}'/>
+		   	<button type="button" id="btn_Flash" onclick="input_App() " >do it</button>&nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp;&nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed  </a> &nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a> &nbsp; &nbsp;<a href="index.html" target="_blank">index</a> 
+		   </div>
+                                                                                                         
+	<div style="font-size:10px">  3.web xlsx &nbsp;  {"emit":"open","Obj":"office","AppType":2,"src":[["https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/x1.tmp","a1.xlsx"]],"pos":1,"par0":{"embed":-1, "Titlebar":0,"Menubar":1,"Toolbars":1,"btnFile":0,"HttpPost":{"URL":"http://eu.httpbin.org/post","valid":0},"MNU_NEWBLANK":0,"MNU_NEW":0,"MNU_OPEN":0,"MNU_CLOSE":0,"MNU_SAVE":0,"MNU_SAVEAS":0,"MNU_PGSETUP":0,"MNU_PRINT":0,"MNU_PROPS":0,"show_UpdateTool":true}}</div>
+<div style="font-size:10px">  4.web pptx &nbsp;  {"emit":"open","Obj":"office","AppType":3,"src":[["https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/p1.tmp","p1.pptx"]],"pos":1,"par0":{"ViewType":1,"Titlebar":0,"Menubar":1,"Toolbars":1,"btnFile":0}}</div>
+<div style="font-size:10px">  5.js control App <!-- 打开d1,实际在par的文件js修改打开d2,增加输入    -->&nbsp;    <button type="button" id="btn2" onclick="call_docJs() " >call_docJs</button>   <button type="button" id="btn2" onclick="UploadFile() " >Upload  Word File</button> 
+ 插入数据<button type="button" id="btn_runCmd" onclick="runCmd('word1') " >word</button>  
+  <button type="button" id="btn_runCmd" onclick="runCmd('excel1') " >excel</button>   
+  <div style="font-size:10px">  6.wps   &nbsp;  {"emit":"open","Obj":"office","AppType":1,"src":"/demo/htmlDemo/file/d1.docx","pos":1,"par0":{ "progId": "KWPS.Application","embed":-1,"ViewType":1,"Titlebar":1,"Menubar":1,"Toolbars":1,"btnFile":0}}</div>
+ 
+  
+</div>
+
+ <div readonly id="AppEmbed1"  style="border:none; 	width:100%;height:100%" ></textarea>
+	 
+ 
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+/**
+   
+  1、打开Microsoft office命令不成功，却执行了wps，是因为机器同时安装了两个程序，且关联了。http://www.access-cn.com/info/3520-cn.html
+       修复方法：开始的wps 菜单工具中配置工具，高级，取消勾选【 wps office兼容第三方系统和软件】。
+  2、word对话框出现，word服务线程容易被阻塞，无法响应请求
+  3、 embed =-1 默认noClose!=false,可以屏蔽word的关闭按钮
+ 4、 "HttpPost":{"URL":"具体http://eu.httpbin.org/post","valid":1}开启上传功能, 反馈{"code":200 } 或者 "files":{"filename":"demo.docx"}表示成功
+ 5、 全局变量 AppJsObject， AppJsObject.objName来调用  默认为 AppJsObject.word    AppJsObject.excel  AppJsObject.powerpoint   
+      VBA 更多可以执行宏获得，或者参考 https://docs.microsoft.com/zh-cn/office/vba/api/overview/word
+6、progId  推荐使用Microsoft office。 更改progId 可以打开office、 金山、永中的对应办公程序。不指定则依次尝试
+	 AppType=1 word     progId:  默认 ["Word.Application","KWPS.Application","WPS.Application"]   
+	AppType=2  excel    progId: 默认  ["Excel.Application","KET.Application"]   
+	 AppType=3 PPT   progId: 默认  ["PowerPoint.Application","KWPP.Application"]
+*/
+
+
+ 
+
+	 function getQueryString(name) {
+	var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+	var r = window.location.search.substr(1).match(reg);
+	if (r != null) {
+	return unescape(r[2]);
+	}
+	return null;
+	}
+ 
+ 
+	  
+ var file=getQueryString("file") ;     //office.html?file=pdf
+ 
+  var init_mark=  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&flag=1");
+ 
+ 	//office
+ 	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+		  
+ 		//   ReqPar={"emit":"open","Obj":"flash","src":"D:/work/temp/m1.swf","pos":1,"par0":{"autoPlay":1,"toolbar":0,"rightMenu":0,"hitCaption":0,"hideStop":0,"loop":1,"volumeMute":0}}
+	
+	   	   AE.OpenApp(ReqPar);
+  }
+ 
+    //打开pdf
+		//  ReqPar={"emit":"open","Obj":"web","AppType":4,"pos":1,"par":{"URL":"https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/AppEmit_help.pdf"},"par0":{"rightMenu":1,"show_UpdateTool":true}}
+ 
+ 
+ /////////操作word对象//////////////////////////////////////////////
+ UploadFile=function(){
+ 
+ 	  var Req={"emit":"runCmd","Obj":"office","AppId":1,"codeStr":'AppJsObject.word.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1})' }   
+  
+      AE.OpenApp( Req );
+ 
+ }
+
+
+call_docJs =function(){
+ //通过通过AppJsObject.word 来调用来调用word
+ //上传 AppJsObject.word.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1})
+ var  Text_a="html 这是动态生成的字符"; 
+ var  codeStr='Selection=AppJsObject.word.Selection;Application=AppJsObject.word.Application;'    //注意 结尾一定要有;  或者\r\n 
+  //vue需要使用 AE.txt2code_Vue
+	codeStr+=   AE.txt2code(function(){/*!@preserve
+ActiveDocument = AppJsObject.word.ActiveDocument;
+Content=ActiveDocument.Content; 
+Content.InsertAfter("后面插入内容");
+//Content.InsertParagraphAfter()  ;       //将在文档末尾插入一个段落
+*/});
+		
+			  codeStr+='Selection.TypeText("'+Text_a+'");'            //默认光标在首位
+			// 分段可以采用下面的各种形式   末尾\ 。如果节约压缩空间，可以去掉前面的对齐空格. 
+			
+            codeStr+='Selection.EndKey(6) ;'   //  wdStory  应该设置为6 移动光标至文档结尾
+			codeStr+='Selection.TypeText("移动到末尾"); '
+			codeStr+= "for (i=1;10;1){ \
+						          	if (i%2==0 ) { \
+									       Selection.TypeParagraph(); \
+									      Selection.TypeText('这是生成的第'+i+'句话');   \
+							         }else{ \
+									      Selection.TypeParagraph(); \
+									      Selection.TypeText('单数');  \
+									 }\
+						       };"
+				  codeStr+='Selection.TypeParagraph();'  
+				  codeStr+='Selection.TypeText("'+"These are dynamically generated characters"+'");'    
+ 
+		     codeStr+=    AE.txt2code(function(){/*!@preserve
+ActiveDocument = AppJsObject.word.ActiveDocument;
+oRng = ActiveDocument.Range(0, 0);
+oRng.InsertBefore("开头插入的数据");
+// oRng.InsertParagraphBefore();  //将在文档开头插入一个段落
+ Selection.HomeKey(6)  ;           //wdStory  应该设置为6  不是wdStory 。 移动光标至文档开始
+Selection.TypeText("回到了首位")	;
+*/});
+
+//结束执行,推荐手动上传UploadFile，否则强行关闭，word执行没有完成会报错。
+/*
+var  codeStr_2='if Selection{Selection.TypeParagraph();'          
+	  codeStr_2+='Selection.TypeText("'+"关闭前保存,save before close"+'");' ;   
+	  codeStr_2+='Selection.TypeParagraph();' ;   
+	  codeStr_2+='Selection.TypeText("'+"好的"+'");}' ;   
+	 codeStr_2+='if AppJsObject.word {AppJsObject.word.ActiveDocument.Save();}' ;    
+	*/			
+				
+
+   var Req3={"emit":"open","Obj":"office","AppType":1,"src":"/demo/htmlDemo/file/d2.docx","pos":1
+				   //,"par":{"htmlStr":null,"HttpServer_startUrl":null,"URL":"/demo/htmlDemo/js/officeJs.html","webJs":1}  //通过新的html或者js文件调用
+				   ,"par0":{
+				   "AppStep":{"init":null,  "destroy":null, "closed":null,"loaded":codeStr}  //启动word后定义，通过AppJsObject.word来调用
+				   ,"embed":1,"Titlebar":0,"Menubar":0,"Toolbars":0,"btnFile":0,"Statusbar":0 }
+                   }
+
+   AE.OpenApp( Req3 );
+
+}
+
+//或者中途可以使用runCmd来执行命令
+runCmd=function(cmdId){         //  或者在嵌入网页officeJs.html 中 js   直接调用
+ 
+       // com.DumpTypeInfo(shockwave)
+
+		var codeStr,codeStr2
+      
+	 if(cmdId=="word1"  ){
+ //  在officeJs里面定义了   Selection=AppJsObject.word.Selection,直接调用Selection
+			  codeStr =   AE.txt2code(function(){/*!@preserve
+Selection.TypeParagraph();                          
+Selection.TypeText("控制插入一句话-runCmd"); 
+*/});
+			  codeStr2 =   AE.txt2code(function(){/*!@preserve
+Selection.TypeParagraph();                          
+Selection.TypeText("多个命令插入"); 
+*/});
+		}else if(cmdId=="excel1"  ){
+ //  在officeJs里面定义了   Selection=AppJsObject.excel.Selection,直接调用Selection
+			  codeStr =   AE.txt2code(function(){/*!@preserve
+ Application.ActiveCell.FormulaR1C1 = "动态插入数据123";
+*/});
+		}
+		
+	  var Req={"emit":"runCmd","Obj":"office","AppId":1,"codeStr":codeStr }   
+      var Req2={"emit":"runCmd","Obj":"office","AppId":1,"codeStr":codeStr2 }  
+	 if(cmdId=="word1"  )  { 
+	     AE.OpenApp([Req,Req2,Req2,Req2,Req2,Req2,Req2,Req2,Req2,Req2,Req2,Req2,Req2],null,null,200); //间隔时间应该长一些防止office反应不过来
+     }else{
+      AE.OpenApp( Req );
+   
+   }
+
+}
+
+
+</script>
+</body>
+</html>

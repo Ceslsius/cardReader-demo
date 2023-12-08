@@ -1,0 +1,169 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+	https://www.cnblogs.com/strinkbug/p/7003865.html
+	/etc/hosts存放的是域名与ip的对应关系，域名与主机名没有任何关系，你可以为任何一个IP指定任意一个名字，hostname文件的一个例子：
+127.0.0.1       localhost
+192.168.1.1 
+
+
+
+ -->
+   <style type="text/css">
+  .Appboxs {
+  margin-top:10px;
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex 
+    display: flex; 
+   display: box;
+  display: flexbox;
+  justify-content:space-around;
+}
+</style>  
+</head>
+
+<body >
+
+<a href="index.html" target="_blank">hardware Demo</a> &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed</a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a>&nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a>
+<div class="container">
+ 
+	 
+		   </div>
+		   <button type="button" id="rtsp2WebRTC" onclick="init_App() " >启动rtsp2WebRTC后台服务-关闭</button> 
+ 
+		   </div>
+             <div id="Appboxs" >
+                
+		</div>
+ 
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+ 
+<script>
+	//转为webRTC ，支持原生浏览器,格式要求严格。H264_AAC H264_PCMALAW MICRO PCM 摄像头设置 audio codec   ALAW or MULAW //要求设置为H264 HIGH Profile 不然报SPS PPS错误
+ //最好是使用域名的摄像头地址，本地测试IP类的RTSP地址，会导致二次连接服务端口重定向到原始首页，而无法播放新的视频
+ 
+       var pid="BED083E6-AB12-4B63-B953-38650097445A";       //需要修改为开发者自己申请的
+	  var pidAuthKey="A1-XOuxNq7qKSv5Ha1Nt6ebC6-rRd_9KLx_wkVBXD_hFH1au7DRdFK9KkYEC5QZzk_6";   //需要修改为开发者自己申请的
+	  var http_port=":8083";
+	var input_App= function(Jdata){    //回调的数据Jdata
+
+       var webRTC_cfg=  {
+							  "server": {
+								"http_port": http_port,
+								"ice_servers": ["stun:stun.l.google.com:19302",'stun:stun.ekiga.net','stun:stunserver.org','stun:stun.voipstunt.com','stun:stun.services.mozilla.com']
+							  },
+							  "para":{
+								"webTemplate": "/demo/htmlDemo/web/templates/*",    //正式环境 web文件夹拷贝到plugins/privete/[:pid]/web 下面  ，修改赋值为 "web/templates/*"
+								"webStatic":"/demo/htmlDemo/web/static",     //正式环境 web文件夹拷贝到plugins/privete/[:pid]/web 下面  ，修改赋值为  "web/static"
+								//"webTemplate": "web/templates/*",
+								//"webStatic":"web/static",
+								"url_player":  "/stream/player",
+								"url_receiver":"/stream/receiver",
+								"url_codec":"/stream/codec",
+								"TLS":false,
+								"crt":"/etc/letsencrypt/live/domain.com/fullchain.pem",
+								"privkey":"/etc/letsencrypt/live/domain.com/privkey.pem"
+
+							  },
+							  "streams": {
+								"H264_AAC": {
+								  "on_demand": true,
+								"url": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov" //  "url": "rtsp://192.168.3.118:8554/vlc"
+								  //  "url": "rtsp://192.168.3.118:8554/vlc"         //no 需要域名地址
+								},
+								"MICRO": {
+								  "on_demand": true,
+								  "url": "rtsp://akaimp.duckdns.org/live/ch00_0"
+								},
+								"PCM": {
+								  "on_demand": true,
+								  "url": "rtsp://admin:admin123@10.128.18.224/mpeg4"
+								},
+								"H264_PCMALAW": {
+								  "on_demand": true,
+								  "url": "rtsp://admin:evro0811@89.21.77.183:33556/"
+								}
+							  }
+							}
+	    
+
+      //"webRTC_dos"  //1 显示调试dos窗口 0正式环境不显示，默认路径限制在plugins/privete/[:pid]/web 下面
+	  //调试的时候关闭dos会同时关闭appemit.exe，则重启即可
+	  //force 1强力重开程序 0默认已经开启的程序 不处理 rtsp2webRTC.exe
+       var  ReqPar= {"emit":"open","Obj":"rtsp2webRTC","AppShow":0,"AppFollow":0,"AppRuntime":1,"par":{"webRTC_cfg":webRTC_cfg,"pid":pid,"webRTC_dos":0,"AuthKey":pidAuthKey},"par0":{"force":0}};
+ 		   
+	     AE.OpenApp(ReqPar );    
+ 
+	   }
+	   
+	   
+ 
+    var link_player=function(){
+	  //需要改进
+	var new_link="http://127.0.0.1"+http_port+"/stream/player/H264_AAC"+"?aert="+window.location.href;
+	if   (new_link.indexOf("runtime=1")>-1 )  {
+     	 	new_link= new_link.replace(/runtime=1/,"runtime=2");
+		  
+	}else{
+	     new_link+="?runtime=2"
+	  }
+	
+     window.location.href=new_link;      //window.open(new_link)
+	  
+	}
+ 
+	var init_App=function(){   
+ 
+	  //反馈接口与AE.callbackFunc.equ相等后执行对应的函数，当websocket打开,转码成功, ,任务管理器会出现vlc.exe，再执行AE.callbackFunc.func
+         AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":input_App} //连接websocket成功后，执行input_App    
+		                                     ,{"equ": { "Obj":"rtsp2webRTC", "rid": 1,"AppStatus":1,"rep": 0},"func":link_player} //连接websocket成功后，执行input_App    
+                                 ] ;
+ 
+		 AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" );   //连接websocket成功后，执行input_App
+	    // setTimeout(  function (  ) { input_App()},500);     //或者采用延迟执行，不够严谨
+	}
+
+ 
+ 
+	//根据参数	 runtime 判断是否打开关闭rtsp2WebRTC后台服务
+	 var runtime_flag=AE.getUrlPar(window.location.href,"runtime");
+     if  (runtime_flag==1 ) { 
+	         init_App();          //载入页面运行 
+	 }else if(runtime_flag ==2){
+	       //关闭后台服务程序
+	         var  AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0}
+			                                        ,"func":function(){
+															     ReqPar= {"emit":"closeAll","Obj":"rtsp2webRTC","AppRuntime":1};					   
+																 AE.OpenApp(ReqPar );    
+ 																 
+																 setTimeout(function(){window.location.href=window.location.href.replace(/\?runtime=2/,"");},1500)  //回到初始页面
+																 }
+			                   }   ] ;
+		                                   
+ 
+		      AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");   //连接websocket成功后，执行AE.callbackFunc
+	 
+	 }
+	 
+ 
+ 
+</script>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+<script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+ 
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+ -->
+   <style type="text/css">
+  .Appboxs {
+  margin-top:10px;
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex 
+    display: flex; 
+   display: box;
+  display: flexbox;
+  justify-content:space-around;
+}
+</style>  
+</head>
+
+<body >
+
+
+<div class="container">
+ 
+	 
+		   </div>
+	   <div>	IE 和 Safari 不支持 .ogg 文件格式。这只是一个例子。如需使其在所有浏览器中运行，您应该在 video 元素中使用 source 元素     <a href="" target="_top" id="runtime2"  >runtime2关闭后台服务</a></div>
+   <div style="font-size:10px">
+ 
+ 
+		   </div>
+             <div id="Appboxs" >
+			 
+                  <video id="vlcVideo"  width="600" height="450" controls="controls" muted="true"    >
+    　         　<source  src="" >
+                           </video> 
+<!-- 		      <video id="vlcVideo"  src="http://192.168.1.110:8080/stream" type="video/ogg" width="600" height="450" autoplay="autoplay" controls="controls" loop="loop"> 
+                  Your browser does not support the video tag. 
+             </video>   -->
+  
+			                
+		</div>
+ 
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+ 
+<script>
+	
+ 
+  function  getUrlPar(url,name) {
+    var  paraString = url.substring(url.indexOf("?") + 1, url.length).split("&");
+    var paraObj = {}
+    for (i = 0; j = paraString[i]; i++) {
+        paraObj[j.substring(0, j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=") + 1, j.length);
+    }
+    var returnValue = paraObj[name.toLowerCase()];
+    if (typeof (returnValue) == "undefined") {
+        return "";
+    } else {
+        return returnValue;
+    }
+}
+ 
+	   
+	   
+  	 window.onload=function(){
+      //打开媒体网页
+	  
+	   setTimeout(function(){
+			   var  vlcVideo = document.getElementById("vlcVideo")
+			   
+                       $("#runtime2").attr("href",getUrlPar(window.location.href, "aert"));
+					   vlcVideo.src= getUrlPar(window.location.href,  "ogg_src")  ;             // "http://192.168.1.110:8080/stream";
+						 vlcVideo.play() ;
+				  },1000)
+	  }
+ 
+   //处理chrome Uncaught (in promise) DOMException: play() failed 报错
+ 
+ if (window.addEventListener)
+        document.body.addEventListener("mousedown",  function(){document.getElementById("vlcVideo").muted = false;}, false);
+ else if (window.attachEvent)
+        document.body.attachEvent("onmousedown",  function(){document.getElementById("vlcVideo").muted = false;});
+
+ 
+
+   // init_App();    //载入页面运行 
+
+ 
+
+</script>
+</body>
+
+</html>

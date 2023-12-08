@@ -1,0 +1,195 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 中间件,可以嵌入可以嵌入各类程序，包括flash、office,cad等</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件。可在各个程序之间通信。">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+	-->
+
+ 
+</head>
+<body>
+
+
+<div class="container">
+    
+
+             <div style="font-size:10px">0. install/open Appemit.exe (F12 see console info)   &nbsp; &nbsp; <a href="commUSB.html" target="_blank">串口</a>&nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp;&nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed </a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a> &nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp; &nbsp;<a href="../login.html" target="_blank">Register</a> </div>
+			<div style="font-size:10px"> 1. connet websocket,support wss
+			<input type="text" class="form-control" size="80" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+			 <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button>
+			 </div>
+
+
+			<div style="font-size:10px">2 get offLine msg
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"olMsg","AppShow":false,"AppMark":"msg0","par0":{"objName":"olMsg","toSids":["1"],"toGids":[1,2]},"par":{"varChar":255,"threads":1,"zmqType":2,"setsockopt":[6,22],"connect":"tcp://localhost:5556","sleeps":1000,"saveDays":-3,"wsockSleep":1000}}' />
+				 <!-- 更多信息 ["device","os","display","cpu","net","memory","storage","base"]   -->
+				<button type="button" id="d" onclick="open_App() " >do it</button>
+			    <button type="button"  onclick="stopMsg() " >stop</button> 
+				    <button type="button"  onclick="pauseMsg() " >pause</button> 
+				 <button type="button"  onclick="setMsg() " >set</button> 	
+				  <button type="button"  onclick="startMsg() " >start</button> 	
+				
+				  </div>
+				  
+				<div style="font-size:10px"> 浏览器websocket
+				  <button type="button"  onclick="recvMsg() " >recvMsg</button> 	
+				  <button type="button"  onclick="pauseWS() " >pauseWS</button> 	
+				  <button type="button"  onclick="resumeWS() " >resumeWS</button> 	
+				   <button type="button"  onclick="stopWS() " >stopWS</button> 	
+		 </div>
+			<div style="font-size:10px">2.2. emit msg to someone [All sids=cid, self_sid emit msg  to(distinct (toSids ∪ toSids)-self_sid) ]&nbsp; {"emit":"msg", "Obj":"sid","toSids":["2"],"toGids":[1,2],"data":"hi, I am Tom."} </div>           
+ 
+				 <div>
+		 
+				 <div   style="min-width:30px;min-height:10px;width:600px;height:100px" ></div>
+				 <div  id="AppEmbedOut" style="float:left;width:40%"></div>  
+	 
+				<div   style="min-width:30px;min-height:700px;width:600px;height:700px" ></div>
+				<div   style="min-width:30px;min-height:5px;width:600px;height:700px" >测试<a href="appemitWeb://">启动 appemit</a></div>
+		</div>  
+</div>
+ <!-- 如果使用Gzip压缩解压数据，则需要引入
+<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>   
+-->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+
+<script type="text/javascript">
+   
+ 
+		 //可调整的参数                                       //$(function () { window.οnlοad=	 function () {
+ 
+	var init_App=function(){   
+	      AE.callbackFunc=  [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":open_App}  
+		                          , {"equ": { "AppStatus":1, "Obj":"olMsg", "rid": 1,service: "appemit","rep": 0},"func":input_App2}
+								  
+								  
+								]
+								
+	 AE.InitApp(document.getElementById('input_url').value);
+	 
+	//  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=0");
+		 
+	}
+	/*
+	           par0={ "varChar":255,
+		 "threads":1,
+		 "zmqType":2,
+		 "setsockopt":[6,22],
+		 "connect":"tcp://localhost:5556",
+		 "sleeps": 1000,
+		  "saveDays":-3,
+             "wsockSleep":1000 }
+*/
+  //   说明："emit":"open","Obj":"olMsg" 请求设定了"wsockSleep"  会自动获取信息到浏览器websocket
+  //     connect  会自动运行 后台线程接收服务器消息
+	var open_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+ 
+	   	  AE.OpenApp(ReqPar);            //数组内多条消息异步打开APP
+		   // AE.OpenApp_sync(ReqPar);     //数组内多条消息同步打开 
+ 
+	   }
+	
+	var input_App2= function(Jdata){    //回调的数据Jdata
+  
+	     // console.log(22,Jdata) 
+ 
+	   }
+	
+     init_App();
+ 
+ 		 // 启动获取消息的线程 
+	 startMsg=function(){
+         // 在"emit":"open","Obj":"olMsg" 请求中会自动启动获取消息，如果已经启动，且输入参数没有变化，则保持原有，否则重启开启新的线程
+            var  ReqPar2={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"st1","par":{"objName":"olMsg","callFun":{"start":[]}  }}	   
+           AE.OpenApp(ReqPar2);
+		}
+		
+
+		
+		
+  // 暂停 获取消息的线程，即使不处理关闭后重启也会再运行
+		pauseMsg=function(){
+		//    默认 inPar["objName"]:="libvlc"，如果修改可以在  {"emit":"open","Obj":"libvlc","AppType":1,"pos":1,"AppId":1,"par"里面设置ObjName
+		//AppJsObject[inPar["objName"]]."start"
+ 
+            var  ReqPar5={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"p1","par":{"objName":"olMsg","callFun":{"pause":[]}  }}	   
+           AE.OpenApp(ReqPar5);
+		}
+		 //  停止 获取消息的线程，关闭后不再运行
+	 stopMsg=function(){
+ 
+            var  ReqPar3={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"s1","par":{"objName":"olMsg","callFun":{"stop":[]}  }}	   
+           AE.OpenApp(ReqPar3);
+		}
+	  //  仅设置获取消息的线程的参数
+	 setMsg=function(){
+      var  inPar2={
+		 "varChar":255,
+		 "threads":1,
+		 "zmqType":2,
+		 "setsockopt":[6,22],
+		 "connect":"tcp://localhost:5556",
+		 "sleeps": 1001 }
+ 
+		
+            var  ReqPar3={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"s1","par":{"objName":"olMsg","callFun":{"set":inPar2}  }}	   
+           AE.OpenApp(ReqPar3);
+		}
+			 //   获取消息的线程 
+	 getStatusMsg=function(){
+ 
+            var  ReqPar3={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"gs1","par":{"objName":"olMsg","callFun":{"getStatus":[]}  }}	   
+           AE.OpenApp(ReqPar3);
+		}	
+		
+		
+	////////////////设置 获取消息到浏览器websocket////////////////////////////////////////////////////////////////////
+	 	 //  获取消息 到websocket
+	 recvMsg=function(){
+         // 在"emit":"open","Obj":"olMsg" 请求中会自动启动获取消息的线程startMsg， 然后运行获取消息recvMsg
+		 inPar1={"wsockSleep":1000,          //1000毫秒间隔发送数据到浏览器websocket
+		             "saveDays":-3                   //保存3天前的数据
+		 }
+            var  ReqPar3={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"rs1","par":{"objName":"olMsg","callFun":{"recvMsg":inPar1}  }}	   
+           AE.OpenApp(ReqPar3);
+		}	
+		
+		
+		 //  暂停 获取消息的线程 
+	 pauseWS=function(){
+ 
+            var  ReqPar3={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"pw1","par":{"objName":"olMsg","callFun":{"pauseWS":[]}  }}	   
+           AE.OpenApp(ReqPar3);
+		}
+	 //  恢复获取消息的线程 
+	 resumeWS=function(){
+ 
+            var  ReqPar3={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"rw1","par":{"objName":"olMsg","callFun":{"resumeWS":[]}  }}	   
+           AE.OpenApp(ReqPar3);
+		}
+	 //  恢复获取消息的线程 
+	 stopWS=function(){
+ 
+            var  ReqPar3={"emit":"runCall","Obj":"olMsg","AppId":1,"AppMark":"stw1","par":{"objName":"olMsg","callFun":{"stopWS":[]}  }}	   
+           AE.OpenApp(ReqPar3);
+		}
+
+
+ 	
+</script>
+</body>
+
+ 
+
+</html>

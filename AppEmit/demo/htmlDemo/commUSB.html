@@ -1,0 +1,117 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 中间件,可以嵌入可以嵌入各类程序，包括flash、office,cad等</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件。可在各个程序之间通信。">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+	-->
+
+ 
+</head>
+<body>
+
+
+<div class="container">
+    
+
+             <div style="font-size:10px">0. install/open Appemit.exe (F12 see console info)   &nbsp; &nbsp; &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp;&nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed </a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a> &nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp; &nbsp;<a href="../login.html" target="_blank">Register</a> </div>
+			<div style="font-size:10px"> 1. connet websocket,support wss
+			<input type="text" class="form-control" size="80" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+			 <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button>
+			 </div>
+
+
+			<div style="font-size:10px">2. 异步串口
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"comm","AppType":1,"AppShow":0,"pos":0,"par":{"objName":"Pcomm1","Port":"COM1","BaudRate":"9600","ByteSize":"8","Parity":"none","StopBits":"1"},"par0":{"autoPort" :2,"Send_AsciiHex":"Ascii","Recv_AsciiHex":"Ascii"}}' />
+				 <!-- 更多信息 ["device","os","display","cpu","net","memory","storage","base"]   -->
+				<button type="button" id="btn_Flash" onclick="input_App() " >do it</button>
+			 
+			</div>
+		 
+			 <div style="font-size:10px">3. usb hid; {"emit":"open", "Obj":"usbhid","AppShow":false,"par":{}, "par0":{"getUsbHids":1}} </div>
+		  	     <div style="font-size:10px">4.  两个串口&nbsp; [{"emit":"open","Obj":"comm","AppType":1,"pos":1,"par":{"objName":"Pcomm1","Port":"COM1","BaudRate":"9600","ByteSize":"8","Parity":"none","StopBits":"1"},"par0":{"Send_AsciiHex":"Ascii","Recv_AsciiHex":"Ascii"}},{"emit":"open","Obj":"comm","AppType":1,"AppId":2,"pos":1,"par":{"objName":"Pcomm2","Port":"COM2","BaudRate":"9600","ByteSize":"8","Parity":"none","StopBits":"1"},"par0":{"Send_AsciiHex":"Ascii","Recv_AsciiHex":"Ascii"}}] </div> 
+  
+		 <div style="font-size:10px"> &nbsp;发送数据&nbsp; {"emit":"send","Obj":"comm","AppType":1,"AppId":1,"data":"可以,第1，from com1 ","par0":{"Send_AsciiHex":"Hex","toFormat":"Hex"}}</div>   
+          <div style="font-size:10px">  {"emit":"runCmd","Obj":"comm","AppType":1,"AppId":1,"codeStr":"AppJsObject.Pcomm1.write('动态写入ascii数据1')"}</div>   
+		 
+				 <div>
+		  
+				  <div style="margin-top:10px;text-align:center; width:60%  ">
+				 <!--    textarea或者改为div  ， AppEmbed 要一致 -->
+					<div id="AppEmbed1"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:700px;height:300px" ></div>
+			 
+					<div  id="AppEmbed2"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:700px;height:300px" ></div>
+			    </div>
+				 <div  id="AppEmbedOut" style="float:left;width:40%"></div>  
+				<div   style="min-width:30px;min-height:700px;width:600px;height:700px" ></div>
+				<div   style="min-width:30px;min-height:5px;width:600px;height:700px" >测试<a href="appemitWeb://">启动 appemit</a></div>
+		</div>  
+</div>
+ <!-- 如果使用Gzip压缩解压数据，则需要引入
+<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>   
+-->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+
+<script type="text/javascript">
+ 
+	//  {"emit":"open"
+	//  ,"Obj":"comm"
+	//  ,"AppType":1
+	//  ,"AppShow":0,   //不显示窗口
+	//	"pos":0,   // 不输入窗口位置
+ 
+	//	"par":{"objName":"Pcomm1",
+	//	"Port":"COM1",
+     // 
+	//	"BaudRate":"9600",
+	//	"ByteSize":"8",
+	//	"Parity":"none",
+	//	"StopBits":"1"},
+	//	"par0":{
+	      // "PortStr":"CP210x||+1",    //优先方法a  设置的Port不可用，会根据自行定义字符串CP210x标识来在deviceName 或者 description查找确定comI,再根据||后面的计算规则（可选）得到com(I+1)端口
+	    //   "autoPort" :2,   //方法b  设置Port但是端口不可用， 1自动尝试下一个串口， 2手动选择一个串口（推荐）
+	//	"Send_AsciiHex":"Ascii",
+	//	"Recv_AsciiHex":"Ascii"
+	//	}
+	//	}
+	  
+     //回调的数据
+ 	   	  AE.callbackFunc= [{"equ": { "Obj":"comm" ,"rep": 0,"AppId":1},"neq":{"data":null,"RecvCnt":null}
+		                        ,"func":function(Jdata,inPar){console.log(111,Jdata.data)}}  
+                             ] ;  
+							 
+							 
+		 //可调整的参数                                       //$(function () { window.οnlοad=	 function () {
+ 
+	var init_App=function(){   
+	 AE.InitApp(document.getElementById('input_url').value);
+	 
+	//  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=0");
+		 
+	}
+	   
+	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+ 
+	   	  AE.OpenApp(ReqPar);            //数组内多条消息异步打开APP
+		   // AE.OpenApp_sync(ReqPar);     //数组内多条消息同步打开 
+ 
+	   }
+	
+ 
+ 
+</script>
+</body>
+
+ 
+
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+ -->
+   <style type="text/css">
+  .Appboxs {
+  margin-top:10px; display: -webkit-box;     display: -moz-box;  display: -ms-flexbox;  display: -webkit-flex;display: flex; display: box;  display: flexbox;  justify-content:space-around;
+}
+</style>  
+</head>
+
+<body >
+
+
+<div class="container">
+<input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+     <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button> &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp; &nbsp; &nbsp; &nbsp;<a href="index.html" target="_blank">hardware Demo</a> &nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed</a>&nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp;  &nbsp; <a href="../login.html" target="_blank">Register</a> 
+      <div >  
+		<div style="font-size:10px">v5 mplayer:   
+				<!-- <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.zhihu.com"}}'/>
+ -->		 	
+ <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value=' {"emit":"open","Obj":"mplayer","AppType":1,"pos":1,"AppId":1,"par":{ "mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov" },"par0":{"fullscreen":1,"volume":70,"autoplay":1,"controls":1,"bgcolor":"2A2937"}}'/>
+	 
+		 <button type="button" id="btn_1" onclick="input_App() " >do it</button>
+		 
+	   <button type="button" id="btn3 " onclick="changeMRL() " >更换播放源 </button> 
+      <button type="button" id="btn3 " onclick="isPaused1() " >isPaused </button> 
+	   <button type="button" id="btn3 " onclick="pause_resume() " >暂停继续 </button> 
+	<div style="font-size:10px">  <button type="button" id="btn3 " onclick="regEvent() " >注册事件 </button> 
+	 
+      <button type="button" id="btn3 " onclick="call2app() " >多开 mplayer</button> </div>
+	
+ <div style="font-size:10px">close  :  {"emit":"close","Obj":"mplayer","AppId":1}           &nbsp;  &nbsp; &nbsp;      or   &nbsp;   &nbsp; {"emit":"closeAll","Obj":"mplayer"}</div>      
+
+
+<!--  .Appboxs {
+                margin: 0 30px 0 260px;
+                padding: 40px 0 0 0;
+                position:absolute;绝对
+                top: 30px; 固定上部
+                left: 3%; 左边留成百分比
+                width:1200px;宽度固定
+                }
+ 
+当左右拉动放大缩小浏览器时，不会变化。
+ -->
+ 
+		   </div>
+             <div class="Appboxs" >
+			 
+			 <!--    textarea或者改为div  都可以,绑定嵌入APP的位置, AppEmbed 要一致。如果要跟随浏览器变化大小，设置相对%比例即可-->
+ 		    <div id="AppEmbed1"  style="border: solid 1px #F0F0F0; min-width:30px;min-height:20px;width:400px;height:360px" ></div>
+			 
+			 <div id="AppEmbed2"  style="border: solid 1px #F0F0F0;min-width:30px;min-height:20px;width:400px;height:360px" ></div>
+    <!--   <div id="AppEmbed1"  style="border: solid 1px #F0F0F0; min-width:30px;min-height:20px;width:1200px;height:400px" ></div>-->
+			                
+		</div>
+	 
+              <div style=" margin-left:1200px; margin-top:1200px;text-align:center ">
+			     测试滚动 
+		</div>  
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+ 
+<script>
+ /**方案说明 
+A 方案 VLC播放RTSP  见rtsp.html , 可以直接libvlc调用，或者网页内核打开，或者转码ogg 或者 webtrc
+B 方案 mplayer播放RTSP  见rtsp2.html
+C 方案 mpvPlayer播放RTSP  见rtsp3.html
+D 方案 easyPlayerRTSP调用ffmpeg库播放RTSP .见rtsp4.html
+//////////////////////////////////////////
+
+B 方案 使用开源程序万能播放器 MPlayer的Slave模式 
+ 
+ 1、MPlayer简介
+       MPlayer(http://www.mplayerhq.hu/design7/news.html)是一款开源多媒体播放器，以GNU通用公共许可证发布。此款软件可在各主流作业系统使用，例如Linux和其他类Unix系统、Windows及Mac OS X系统。
+       MPlayer建基于命令行界面，在各作业系统也可选择安装不同的图形界面。mplayer的另一个大的特色是广泛的输出设备支持。它可以在X11、Xv、DGA、OpenGL、SVGAlib、fbdev、AAlib、DirectFB下工作，且能使用GGI和SDL和一些低级的硬件相关的驱动模式（比如Matrox、3Dfx和Radeon、Mach64、Permedia3）。MPlayer还支持通过硬件MPEG解码卡显示，如DVB 和DXR3与Hollywood+。
+       MPlayer的开发始于2000年。最初的作者是 Arpad Gereoffy。MPlayer最初的名字叫"MPlayer - The Movie Player for Linux"，不过后来开发者们简称其为"MPlayer - The Movie Player"，原因是MPlayer已经不仅可以用于Linux而可以在所有平台上运行。
+       MPlayer1.3下载地址： https://jaist.dl.sourceforge.net/project/mplayerwin/MPlayer-MEncoder/r38151/
+
+ 2、实现原理
+    为MPlayer编写GUI程序有两种方法：
+       a、MPlayer源码
+            这种方法需要读懂MPlayer的源码，直接修改他里面的代码，这样我们做得界面就能够和MPlayer一体了（当然也能够通过link mplayer用到的任何的库和.o文档，把他无缝的集成在程式里面）       
+       b、使用Slave模式
+            所谓的slave模式，就是mplayer在运行过程中能够接收用户的输入命令行，具体支持哪些命令行，能够通过mplayer -input cmdlist这条命令来得到，在Mplayer源码的slave.txt中也有对这些命令有详细的讲解。Slave模式下工作的Mplayer可以和系统的标准输入、输出进行信息交互。我们可以用linux C编程来完成对slave模式工作的Mplayer进行控制和信息获取。
+       
+	   appemit使用方案B。
+	   
+		进程间调用（即GPL条款中执行独立程序的行为）不会被GPL传染，除非进程间交换了复杂的内部结构体（exchanging complex internal data structures）. 而且GPL的程序也可以与非GPL的独立程序一起储存传播 - 所谓单纯聚集行为（Mere aggregation ），所以只要不违反GPL条款打包在一起没什么问题。
+		参考官方FAQ: http://www.gnu.org/licenses/old-licenses/gpl-2.0-faq.html
+		MPlayer的slave模式是基于命令行的进程间调用、涉及不到复杂的内部结构体、所以调用代码不会被GPL传染。
+		一个例子是MPlayer官网上的链接的slave组件libplayer使用的就是LGPL。
+ 
+ 
+ */
+ 
+  //init_App();    //载入页面运行 
+  
+  var webMp4_demo1="https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/n1.mp4"
+  var webRtsp_demo2="rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+  var mp4_demo0="/demo/htmlDemo/file/q1.mp4"
+  
+  
+  //////////////////////////////////////////
+  //    默认引擎
+  //    "engine": ["-vo","gl","-quiet","-mc","0","-fontconfig","0","-subcp", "936"]
+  //    初始化启动比较慢，
+  //
+  //
+  //
+  //
+ //////////////////////////////////////////////
+	var init_App=function(){   
+		AE.InitApp(document.getElementById('input_url').value);
+	
+	}
+ 
+ 	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar0={};
+	       ReqPar0=JSON.parse(document.getElementById("input_par").value);
+		 //  AE.OpenApp(ReqPar);
+	   //执行文本框里的内容
+      AE.OpenApp(ReqPar0);
+		 
+		 
+  }	
+  
+  //////changeMRL 新开////////////
+   function changeMRL(){
+ var  cmd21=AE.txt2code(function(){/*!@preserve
+  {
+     AppJsObject.mplayer.newOpen("/demo/htmlDemo/file/q1.mp4")
+     //return  {isPaused:AppJsObject.mplayer.isPaused()}
+  }
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req21={"emit":"runCmd","Obj":"mplayer","rid":"mplayerisPaused_mark","AppId":1,"codeStr":cmd21 }    //"AppMark":"mplayerLength_mark"
+ 
+      AE.OpenApp(Req21);
+
+} 
+  
+
+ 
+	////////获取数据//////////////////////////////////////////							  
+ function isPaused1(){
+ var  cmd1=AE.txt2code(function(){/*!@preserve
+  {
+     return  {isPaused:AppJsObject.mplayer.isPaused()}
+  }
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req={"emit":"runCmd","Obj":"mplayer","rid":"mplayerisPaused_mark","AppId":1,"codeStr":cmd1 }    //"AppMark":"mplayerLength_mark"
+ 
+      AE.OpenApp(Req);
+
+} 
+ 
+ 
+ //切换 暂停 继续//////////////////////////////////////////////////	 //AppJsFun.log(22)
+ 	  /*
+    if AppJsObject.mplayer.isPaused(){
+	   AppJsObject.mplayer.resume(); 
+	   AppJsFun.log(22);
+	}else{
+	    AppJsObject.mplayer.pause();
+		AppJsFun.log(0);
+	}
+	*/
+ var callback2= function(Jdata,inPar){    //回调的数据Jdata
+ 
+     console.log(Jdata)
+  }		
+ function pause_resume(){
+ var  cmd2=AE.txt2code(function(){/*!@preserve
+     // if AppJsObject.mplayer.isPaused(){AppJsObject.mplayer.resume(); }else{ AppJsObject.mplayer.pause();}
+	//等效toogle
+	AppJsObject.mplayer.toogle();
+	
+	return {AppJsObject.mplayer.isPaused()}
+   
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req2={"emit":"runCmd","Obj":"mplayer","rid":"mplayerpause_resume_mark","AppId":1,"codeStr":cmd2 }    //"AppMark":"mplayerLength_mark"
+ 
+      AE.OpenApp(Req2);
+
+} 
+ 
+  //////////回调函数////////////////////////////////////
+  callback1= function(Jdata,inPar){
+   console.log("call balc 1",Jdata,inPar)  //业务处理，play要考虑 resume之后也会有一个play
+   if (Jdata.data && Jdata.data.first) {
+     console.log("第一次播放成功")
+   
+   }
+ 
+ }
+ 
+    // 如果equ有多个反馈同时相等，都会回调。要确保唯一，可以指定rid或者AppMark
+    AE.callbackFunc= [{"equ": { "Obj":"mplayer",  "event": "play" ,"rep": 0},"func":callback1, "inPar":"inPar 111"}
+	                              ,{"equ": { "Obj":"mplayer",  "rid": "mplayerpause_resume_mark" ,"rep": 0},"func":callback2, "inPar":null}  //测试
+								  ] ;  
+								  
+ 
+
+/////////////////////////注册事件，回调////////////////////////////
+	//   "event":["click","Rclick","resume","play","pause","stop","end","volume","mute","fullscreen","Error","LengthChanged","trackbar","close"] 监控左右单击事件，右键双击截图 左键双击全屏
+	//可以通过回调函数来处理对应的注册事件
+//先定义回调函数
+var eventAll=["click","Rclick","resume","play","pause","stop","end","volume","mute","fullscreen","trackbar","close"]    
+
+ 
+function regEvent(){
+   
+   var ReqPar11={"emit":"open","Obj":"mplayer","AppType":1,"pos":1,"AppId":1,"par":{"mrl":webMp4_demo1,"engine":["-vo","gl","-quiet","-mc","0","-fontconfig","0","-subcp", "936"]},"par0":{"minmaxclose":[0,0,1],"volume":70,"autoplay":1,"controls":1,"event":eventAll }}
+     
+      
+	AE.OpenApp(ReqPar11);
+ } 
+ 
+/////////////////////////////////////////////////////////////////////////////////////////
+ //多开  call2app
+ 
+ function call2app(){
+   
+   var ReqPar11=[{"emit":"open","Obj":"mplayer","AppType":1,"pos":1,"AppId":1,"par":{"mrl":webMp4_demo1},"par0":{"autoplay":1}}
+                 ,{"emit":"open","Obj":"mplayer","AppType":1,"pos":1,"AppId":2,"par":{"mrl":webMp4_demo1},"par0":{"autoplay":1}}
+				 ]
+      
+	AE.OpenApp(ReqPar11);
+ } 
+ 
+ /**
+ 更多  http://www.mplayerhq.hu/DOCS/tech/slave.txt
+ 
+封装函数 
+AppJsObject.mplayer.newOpen()
+AppJsObject.mplayer.toogle()
+AppJsObject.mplayer.expect(  = 等待直到模式匹配成功,返回匹配结果,
+AppJsObject.mplayer.expect(.("模式表达式",超时,文本最大长度) = 超时参数是以毫秒为单位的估算值,可省略\n参数@3可省略，默认为1024
+AppJsObject.mplayer.print("__") = 写入命令，支持一个或多个参数\n多个参数间添加空格,尾部添加换行
+AppJsObject.mplayer.printf("__") = 写入命令，\n调用string.format函数格式化参数,尾部添加换行
+AppJsObject.mplayer.keyDownEvent(.(虚拟键码) = 发送按键事件
+AppJsObject.mplayer.getResponse(.("模式表达式") = 获取格式输出
+AppJsObject.mplayer.loadfile( = 打开视频文件
+AppJsObject.mplayer.loadfile(.("视频文件",是否添加到播放列表) = 参数@2默认为false
+AppJsObject.mplayer.subLoad( = 添加字幕文件
+AppJsObject.mplayer.subLoad(.("字幕文件") = 添加字幕文件
+AppJsObject.mplayer.stop() = 停止播放
+AppJsObject.mplayer.quit() = 退出
+AppJsObject.mplayer.pause() = 暂停
+AppJsObject.mplayer.frameStep() = 播放一帧
+AppJsObject.mplayer.quit() = 退出\n
+AppJsObject.mplayer.subAlignment( = 字幕对齐\n0 顶部对齐\n1 居中对齐\n2 底部对齐
+AppJsObject.mplayer.subDelay( = 调整字幕偏移值
+AppJsObject.mplayer.subDelay(.(偏移值,是否绝对值) = 参数@2可省略
+AppJsObject.mplayer.volume( = 调整声音大小
+AppJsObject.mplayer.volume(.(音量,是否绝对值) = 参数@1为百分比\n参数@2请指定为true
+AppJsObject.mplayer.getVideoResolution() = 返回视频分辨率\n返回两个值
+AppJsObject.mplayer.fullscreen() = 设置全屏
+AppJsObject.mplayer.getFullscreen() = 当前是否全屏
+AppJsObject.mplayer.getPercentPos() = 返回播放进度\n百分比
+AppJsObject.mplayer.getTimeLength() = 返回视频总长度
+AppJsObject.mplayer.getTimePos() = 返回当前播放位置\n视频播放结束返回null
+AppJsObject.mplayer.seekSecond( = 移动到指定位置
+AppJsObject.mplayer.seekPercent( = 按百分比移动到指定位置
+AppJsObject.mplayer.seek( = 移动到指定位置\n参数为相对当前位置的值
+AppJsObject.mplayer.getProperty("名字") = 获取属性值\n可选使用参数@2指定超时,默认为100毫秒,传入0表示禁用超时
+AppJsObject.mplayer.setProperty(.("属性名","属性值") = 修改属性值
+AppJsObject.mplayer.isPaused() = 当前是否暂停状态
+
+*/
+ 
+ 
+</script>
+</body>
+
+</html>

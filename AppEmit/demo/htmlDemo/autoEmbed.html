@@ -1,0 +1,81 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ 
+</head>
+
+<body >
+
+
+<div class="container">
+ <input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="http://s108.hxjy.iwan4399.com/game.php" />     <button type="button" id="btn_Flash" onclick="splitFlow() " >自动分流</button>  
+  <div style="font-size:10px">http://game.37.com/play.php?game_id=288&server_id=300371</div>      
+ 
+ 		     <div id="AppEmbed1" style="width:1200px;height:780px" > </div>
+ 
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据,则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+ 
+<script>
+/**
+* （一）整页嵌入模式
+*  "360SE","360EE","QQBrowser","Sogou" 等浏览器直接跳转，其它则整体嵌入
+*/
+  
+  
+  //引导页http://my.4399.com/yxhxjy/play-sid-108-site-1_1-ref-news-channel-news-randsj-0.4639055443799409
+  //打开此分流嵌入页面autoEmbed.html，分两部分：360等跳转；chrome直接嵌入打开。
+  //不用修改目标页的代码。
+  var targetURL=null;
+ 
+    EmbedWholePage=function(){//整页嵌入目标网页
+	// ReqPar= {"emit":"open","Obj":"web","AppType":2,"AppId":1,"pos":1,"par":{"URL":targetURL,"plugins":["flash_NP"],"par0":{"rightMenu":-1}}}   //webkit内核
+      ReqPar= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":targetURL,"plugins":"flash_ocx"},"par0":{"rightMenu":-1}} ;   //IE内核
+      AE.OpenApp(ReqPar);	
+	}
+
+   splitFlow=function(){
+       targetURL=document.getElementById('input_url').value || "http://s108.hxjy.iwan4399.com/game.php";
+	   if ( ["360SE","360EE","QQBrowser","Sogou"].indexOf(AE.clientInfo.browser) >=0   ) {  //还可以现在其它条件
+		  //跳转到目标网址
+		  window.location.href=targetURL;
+	   }else{     //webkit FF opera edge等浏览器，使用本页直接 嵌入目标网页
+		   AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":EmbedWholePage} ] ;     //连接websocket成功后，执行EmbedWholePage
+		  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");  
+	 
+	   }
+  }
+ 
+ 
+/**
+* （二）局部嵌入模式
+*  "360SE","360EE","QQBrowser","Sogou" 等浏览器直接跳转，其它则局部嵌入
+* 需要在主页html里面引入AppEmit_1.2_min.js,需要嵌入的部分设置为AppEmbed1节点包含
+*/
+
+    EmbedPartialPage=function(){//整页嵌入目标网页
+	   ReqPar= {"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"URL":"http://www.baidu.com" },"par0":{"rightMenu":-1}} ;   //IE内核
+       AE.OpenApp(ReqPar);	
+	}
+	
+   polyFill=function(){
+ 
+	   if ( ["360SE","360EE","QQBrowser","Sogou"].indexOf(AE.clientInfo.browser) <0   ) {  //webkit FF opera edge等浏览器， 局部填充嵌入
+    
+		  AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":EmbedPartialPage} ] ;     //连接websocket成功后，执行EmbedWholePage
+		  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1");  
+	 
+	   }
+  }
+ 
+</script>
+</body>
+
+</html>

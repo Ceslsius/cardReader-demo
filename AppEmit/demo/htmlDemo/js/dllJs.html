@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!--   <meta http-equiv="X-UA-Compatible" content="IE=edge" />-->
+    <style type="text/css">
+    html,body{ height:100%; margin:0; } 
+    </style>
+  <!--  <script src="https://cdn.bootcss.com/firebug-lite/1.4.0/firebug-lite.js#overrideConsole"></script>  -->
+ 
+<script type="text/javascript">
+ /////////////////////////////////////////////////////////////////////////////
+ //  此文件代码都可以放入在dll.html的websocket的js里面使用runcmd ，AE.OpenApp 中参数webJs=0 。
+   //AppJsFun 开头的变量和函数 名称不要修改
+  // external  为直接访问Appemit函数
+  //// appemit@appemit.com 问题反馈
+
+   // 代码里面不能有错误, 要不没有结果
+   //全局变量 com库 AppJsLibrary   AppJsLibrary.objName 访问调用的库的处理  AppJsLibrary.objName.dll 引用dll 只有private可以访问
+   // 全局变量 对象  AppJsObject     AppJsObject.objName 访问实例对象 
+   //   dll :  AppJsLibrary[objName].dll = ..loadDll(v["dllFile"] );   组件: AppJsObject.objName =AppJsLibrary.objName.dll.createEmbed._object 
+ ///////////////////////////////////////////////////////////////////////////////////////  
+
+//主要调用过程, 按事件顺序自动执行/////////////////////
+//AppJs_init  生成AppJsObject前执行
+//AppJs_loaded 系统启动APP ,产生AppJsObject对象后执行
+//AppJs_destroy AppJsObject销毁前执行。 No_Quit_FreeLibrary  不释放dll, FreeLibrary(dll)
+//AppJs_closed AppJsObject关闭后执行。已经没有AppJsObject对象了
+////////////////////////////
+
+ 
+	/////////////////一、js被 AppEmit调用示例/////////////////////////////////////////// 
+   // 1     flash.ocx 可视化示例
+   //  2    reportX.ocx     可视化OCX
+   // 3       dll  个人开发 dll ,交互信息
+  //4     第三方dll 调用      Photoshop.Application
+   //////////////////////////////////////////////////////////////////////
+    var AppType;      //0 关闭 
+	var AppJs_inPar=null;
+	var AppJs_out=null;   //获得执行结果 
+ 
+			function AE_txt2code(fn) {
+				return fn.toString().split('\n').slice(1,-1).join('\n') + '\n'
+			}
+// {"emit":"open","Obj":"dll","AppType":1,"src":[],"pos":1,"par":{"htmlStr":null,"HttpServer_startUrl":null,"URL":"/demo/htmlDemo/js/dllJs.html","webJs":1},"par0":{"AppMethod":"POST Need set" }}
+
+	  
+   //下面4个函数AppJs_init  AppJs_loaded AppJs_destroy AppJs_closed，自动被程序运行。
+   // 如果需要主动命令，同时可以在websocket的html文件 设置
+ 
+	 AppJs_init=function(AppType){  //按照 websocket的参数createObject      生成AppJsObject前执行
+	 //如果这里重新更新定义了，则以此为准,若设置null会替换默认值。 参数结构同调用websocket时一致
+	 // AppType   webJs 最好不要在这里设置
+	 // COM组件 必须有DllGetClassObject     createEmbed(comCarrier,clsId,iid)  , createObject(clsId,iid)   createInstance(clsId,itface)   createUnknown(clsId,iid) .
+    // dll调用 	 createDll
+		 var par;
+		 if (AppType==1){                     // flash  可视化示例
+		    par={ 
+						src:[  {
+								  // webJs0:0,                           //只能设置为0   关闭本js的控制 ;	或者注释 为默认打开控制
+								     "asAdmin":1   //1需要管理员权限注册 0不需要
+								 	,"reg":true    //使用appemit直接调用，一般可以不注册。null 不注册   true 注册 false 卸载注册    
+								    ,createType:"createEmbed"      //可视化的控件 createEmbed(comCarrier,clsId,iid) ,只能有一个 , createObject(clsId,iid)   createInstance(clsId,itface)   createUnknown(clsId,iid) 
+									,objName:"shockwave"             //AppJsObject.shockwave 来访问此控件
+									 ,comCarrier:"custom"           // createEmbed可视化 picture(图片控件设置)、static 、 winform   默认推荐 custom         //不同类型组件采取不同载体
+									,pid:"flash_ocx"
+									//,dllFile:"C:/Windows/SysWOW64/Macromed/Flash/Flash32_33_0_0_401.ocx"     //  必须 和自己电脑安装的一致
+									,dllFile:"plugins/Flash32.ocx"     //  D:\work\softA\AppEmit\plugins\Flash32.ocx
+									,CLASSES_ROOT:"HKEY_CLASSES_ROOT\\ShockwaveFlash.ShockwaveFlash.11\\CLSID"
+									,clsId :"{D27CDB6E-AE6D-11cf-96B8-444553540000}"  //guid
+									,iid:null
+									,itface:null
+									 
+								   }   //暂时支持一个控件
+						    ]
+							,registerServer:1
+						 //,AppShow:true                  //整体不可见 必须设置false，默认可见
+						 //,cookies:                                      
+				    	//,userAgent:                                   
+						//	,proxy:                                         
+					   //	,proxyBypass:                              
+					  //,flags:     	   
+			       }
+			}else if(AppType==2){           // reportX     可视化OCX  调用方法 示例
+		      par={ 
+						src:[  {
+								  // webJs0:0,                           //只能设置为0   关闭本js的控制 ;	或者注释 为默认打开控制
+								    createType:"createEmbedEx"       //可视化的控件等同 createEmbed ,createEmbedEx。createEmbed(comCarrier,clsId,iid)  , createObject(clsId,iid)   createInstance(clsId,itface)   createUnknown(clsId,iid) 
+									,objName:"reportX"            //AppJsObject.reportX 来访问此控件
+									// ,comCarrier:"custom"           // createEmbed可视化  picture(图片控件设置)、static 、winform  默认 推荐 custom           //不同类型组件采取不要载体
+									,pid:"ReportX"
+									,dllFile:"/plugins/thirdparty/report/ReportX.ocx"
+									,clsId :"{A5DA6E97-1D4C-4708-B705-84A45716B4DD}"  //guid
+									,iid:null 
+									,itface:null
+ 
+								   }   //暂时支持一个控件
+						    ]
+						 //,AppShow:true                  //整体不可见 必须设置false，默认可见
+						 //,cookies:                                      
+				    	//,userAgent:                                   
+						//	,proxy:                                         
+					   //	,proxyBypass:                              
+					  //,flags:   
+                  		  
+			       }
+
+
+          }	else if(AppType==3){          
+		  // 32位  dll  个人开发dll   可以 交互信息 示例 data为发送数据. dll的源码是c编写，请见 demo/htmlDemo/dll/dll_demo1.c
+		      par={ 
+						src:[  {                       //,  私有的必需,在appemit登录窗口，我的应用，插件中设置sha1 pid  AuthKey等数据
+								  // webJs0:0,                           //只能设置为0   关闭本js的控制 ;	或者注释 为默认打开控制
+								//   "asAdmin":0   //1需要管理员权限注册 0不需要
+								//	,"reg":null    //使用appemit直接调用，一般可以不注册。null 不注册   true 注册 false 卸载注册    
+								     createType:"createDll"               //  dll开发
+								    ,objName:"dll_demo1"              //自行定义  //AppJsObject.dll_demo1 来访问此dll
+ 									,dllFile:"/plugins/private/50FCF891-1B93-4AE5-8A66-AB26A3C03378/dll_demo1.dll"     //  必须 \\   / 分隔, 个人的插件放在/plugins/private/clsId/文件夹下面
+									,pid:"50FCF891-1B93-4AE5-8A66-AB26A3C03378"
+									,AuthKey:"A1-rbJouaNIsm-NwndUCunpnRW8GYw-72Sp7XbDjiSQ2MuXtEaFyrs1c4nTBrqXHrKu"                //pid的授权，appemit网站获取
+									,clsId :"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"  //guid  自己自行生成的， 最好和pid不同。 dll  里面设置的一致	
+                                    ,CLASSES_ROOT:null        //自行开发dll不用注册，则不用设置
+								   ,clsIdAuthKey:"A1-QG7YAE5aUc7CCPSswU6yfhz6ojjZKFu-MPJy6nWAotpxq9QXRBTxJQZehIlpoAPh"   //dll文件访问的授权 自行设置
+								    ,ver:"1.0.0"  
+									,iid:null  
+									,data:'{"msg":"init from JS","info":1}'               //发送给dll  数据
+									
+								   }   //暂时支持一个控件
+						    ]
+						 ,AppShow:false                  //整体不可见 必须设置，默认可见
+						 
+						 //,cookies:                                      
+				    	//,userAgent:                                   
+						//	,proxy:                                         
+					   //	,proxyBypass:                              
+					  //,flags:     	   
+			       }
+
+
+          }		else if(AppType==4){           // 第3方32位 dll   调用，安全共用的dll联系appemit放在thirdparty目录，否则需要验证放在private目录   
+		      par={ 
+						src:[  {
+								  // webJs0:0,                           //只能设置为0   关闭本js的控制 ;	或者注释 为默认打开控制
+								    createType:"callDll"               //  dll调用  								
+								    ,objName:"dll_demo1"            //AppJsObject.dll_demo1 来访问此dll
+									,pid:"dll_demo1"
+									 //,stdcall_cdecl:"stdcall"
+ 									,dllFile:"/plugins/thirdparty/dll_demo1.dll"     //  必须 \\   /     本例使用dll_demo1，调用add方法
+									,clsId :"{50FCF891-1B93-4AE5-8A66-AB26A3C03378}"  //guid   发送给dll  信息 
+									//,AuthKey:"A1-QG7YAE5aUc7CCPSswU6yfhz6ojjZKFu-MPJy6nWAotpxq9QXRBTxJQZehIlpoAPh"                //
+									,iid:null
+									
+								   }   //暂时支持一个控件
+						    ]
+						 ,AppShow:false                  //整体不可见 必须设置，默认可见
+						 //,cookies:                                      
+				    	//,userAgent:                                   
+						//	,proxy:                                         
+					   //	,proxyBypass:                              
+					  //,flags:     	   
+			       }
+
+
+          }				
+				   
+			par=JSON.stringify(par);
+		
+		  return par  ;      //  必须 json string 
+	}
+	 
+	AppJs_loaded=function(AppType){        //系统启动APP ,产生AppJsObject对象后执行
+		           //1  获得AppEmit的打开参数  //0 关闭  1打开 
+			// 对象全局变量 AppJsObject
+			// 不支持with,VBA的常量需要设置为具体数值。
+			var codeStr;
+		if ( AppType==1 ){             //1
+		        //注意 结尾一定要有;  或者\r\n 
+ 
+		     codeStr =   AE_txt2code(function(){/*!@preserve
+ AppJsObject.shockwave.Movie =AppJsFun.fullpath("/demo/htmlDemo/file/s1.swf");
+ AppJsObject.shockwave.stop();  //不自动播放
+	// AppJsFun.msgbox( AppJsObject.shockwave.Movie );
+*/});
+ 
+			// 分段可以采用下面的各种形式   末尾\ 。如果节约压缩空间，可以去掉前面的对齐空格. 
+ 
+			}else if (AppType==2){        
+               codeStr	 ="return '测试loaded2'"	
+ 
+			}else if (AppType==3){     
+
+ 		     codeStr =   AE_txt2code(function(){/*!@preserve
+
+ AppJsObject.dll_demo1.AppDll_loaded(AppDll_hwnd,'{"rid":-2}','{"data":"loaded from JS","info":2}');    //dll里面默认在ids里面增加了clsid, 此时执行命令， 反馈的msg 中有字段 data，则在浏览器中显示。或者在dll设置data字段也行
+                                                                               
+*/});
+			}else if (AppType==4){        
+//   dll 接口__declspec(dllexport) int Add(int a, int b ) 		
+//自行声明接口，再调用。	
+ 		     codeStr =   AE_txt2code(function(){/*!@preserve
+ AppJsObject.dll_demo1.myAdd =AppJsLibrary.dll_demo1.dll.api( "Add","int(int a,int b)", "cdecl" );   //必须是cdecl 声明
+ 
+ //////方法1///////////////////
+ var sum=AppJsObject.dll_demo1.myAdd(3,5);
+AppJsFun.msgbox(sum);
+return  {data=sum}; 	      	                 //结果在  external.out 中   
+///////////////////////////////
+     
+///////方法2///////////////////
+	     //或者浏览器网页  发布命令runCmd,执行AppDll_RevMsg方法
+//	   codeStr= AE_txt2code(function(){/     *
+//  var sum=AppJsObject.dll_demo1.myAdd(3,5);
+//  return  sum; 
+//  *    /});
+//		 var Req={"emit":"runCmd","Obj":"dll","codeStr":codeStr }    
+//	    AE.EmitReq_PIP(Req);
+/////////////////////////////
+                                                       
+*/});
+			}
+ 
+          // codeStr +='return {status="loaded '+AppType+' OK "};';     //  getOut可以获得 {"status":"loaded OK 1"}
+		 	return codeStr;    // 必须string /null   
+
+	}
+ 
+	AppJs_destroy=function(AppType){    //AppJsObject销毁前执行。 No_Quit_FreeLibrary  不释放dll, FreeLibrary(dll)
+		 //追加
+		 var codeStr;
+		 if  (AppType==1){
+			   
+ 
+		}else if (AppType==2){
+         // //系统本身已经执行了FreeLibrary， 执行释放dll 但是quit 接口不一定正确。可自行释放退出 ; 
+         codeStr="return 'test destroy ,应该执行退出ocx接口的quit、 release等命令，释放资源'";  
+
+	    } else if (AppType==3){           
+ 		     codeStr =   AE_txt2code(function(){/*!@preserve
+AppJsObject.dll_demo1.AppDll_destroy(AppDll_hwnd,'','{"msg":"destroy from JS","info":3}');      //dll里面默认在ids里面增加了clsid 
+*/});
+			}	 
+		return codeStr;    // 必须string /null
+		//系统自动 AppJsObject.quit()
+	}	
+	AppJs_closed=function(status){  //AppJsObject关闭后执行。已经没有AppJsObject对象了
+		AppType=status;                  //0
+		var  codeStr= "return '测试close'";
+		
+		return codeStr; // // 必须string /null
+	}	
+ 
+ 
+	</script>
+
+</head>
+<body>
+ 
+	<div id="container"> 
+    </div>
+</body>
+</html>

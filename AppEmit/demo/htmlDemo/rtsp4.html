@@ -1,0 +1,251 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,dll Ocx支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ <!-- <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script> -->
+ 
+   <style type="text/css">
+  .Appboxs {
+    margin-top:10px;
+     justify-content:space-around;
+    display: -webkit-box; 
+    display: -moz-box; 
+    display: -ms-flexbox; 
+    display: -webkit-flex 
+    display: flex; 
+   display: box;
+  display: flexbox;
+
+}
+</style>  
+ 
+</head>
+
+<body >
+
+
+<div class="container">
+<input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+     <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button> &nbsp;  &nbsp; &nbsp;<a href="index.html" target="_blank">hardware Demo</a>&nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed </a>&nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a> &nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp;  &nbsp; <a href="../login.html" target="_blank">Register</a> 
+      <div >  
+		<div style="font-size:10px">w1. webtype:   
+ 		 
+          <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"plugins":["easyPlayerRTSP"],"URL":null,"htmlStr":null,"HttpServer_startUrl":"plugins/thirdparty/ffmpeg/easyPlayerRTSP/ocx_test.html" }}'/>
+	   
+		 <button type="button" id="btn_Flash" onclick="input_App() " >do it</button> &nbsp;  &nbsp; <button type="button" onclick="close_App() " >close</button> &nbsp;  &nbsp; 
+		  &nbsp;  &nbsp; <button type="button" id="btn_reg" onclick="openRTSP_str()" >str方式注册打开网页</button>
+ 
+		  <button type="button" id="btn_reg" onclick="runcode1()" >发送命令重新打开</button>
+		  
+	 
+		</div>
+	 
+	 <div style="font-size:10px">close  :  {"emit":"close","Obj":"web","AppId":1}           &nbsp;  &nbsp; &nbsp;      or   &nbsp;   &nbsp; {"emit":"closeAll","Obj":"web"}</div>      
+ 
+
+ 
+ 	 
+		   </div>
+             <div class="Appboxs" >
+			 
+			 <!--    textarea或者改为div  都可以,绑定嵌入APP的位置, AppEmbed 要一致。如果要跟随浏览器变化大小，设置相对%比例即可-->
+ 		     <div id="AppEmbed1"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:600px;height:400px" ></div>
+			  <div id="AppEmbed2"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:300px;height:300px" ></div>
+			   <div id="AppEmbed3"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:30px;height:30px" ></div>
+			                
+		</div>
+              <div style=" margin-left:3800px; margin-top:3800px;text-align:center ">
+			     测试滚动 
+		</div>  
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+<script>
+
+ 
+
+ /**方案说明 
+A 方案 VLC播放RTSP  见rtsp.html , 可以直接libvlc调用，或者网页内核打开，或者转码ogg 或者 webtrc
+B 方案 mplayer播放RTSP  见rtsp2.html
+C 方案 mpvPlayer播放RTSP  见rtsp3.html
+D 方案 easyPlayerRTSP调用ffmpeg库播放RTSP .见rtsp4.html
+
+
+
+
+/////////////////////////////////////////////////////
+// 方案4 使用 easyPlayer RTSP 模块 调用 FFmpeg 来播放RTSP流
+   1 方法一，使用IE内核来打开  ,参考 plugins\thirdparty\ffmpeg\easyPlayerRTSP ocx_test.html
+   2 方法二，使用dll方式加载 ocx                                                                       ocx_mutiplayer.html   多开
+   
+ 参数说明： https://github.com/tsingsee/EasyPlayer-RTSP-Win/wiki/EasyPlayer%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E
+ [sURL]：打开的流地址，以rtsp://开头； 
+ [sRenderFormat]：播放渲染格式，枚举对应格式：
+ D3D支持格式如下： YV12: 0 YUY2: 1 UYVY: 2 A8R8G8B8: 3 X8R8G8B8: 4 RGB565: 5 RGB555: 6 GDI支持格式: RGB24: 7 [sUserName]: 
+ RTSP流验证用户名,如果流URL里面已经包含, 这里填空; 
+ [sPassword]: RTSP流验证密码,如果流URL里面已经包含, 这里填空; 
+ [sHardDecord]: 是否使用硬件解码， 0=软解 1=硬解
+ 
+ Config函数配置播放器的一些参数，诸如缓存，是否播放音频，是否按比列显示，是否显示码率信息； 
+ 参数说明： [sFrameCache]：缓存帧数，1-n ，该数值越小，延时越小，当然播放画面可能再网络带宽不理想的情况下会比较卡，反之则延时越大，相应的播放也会比较流畅； 
+ [sPlaySound]：是否播放音频，1=播放，0=不播放 [sShowToScale]：是否按比列显示，1=是 0=否 ，软解码时有效 
+ [sShowStatisticInfo]：是否显示码率信息，1=是 0=否 ，软解码时有效
+
+ SetOSD是新增接口，用于设置视频显示时的OSD显示; 
+ 参数说明： [show]：是否显示OSD，1=显示 0=不显示 
+ [alpha]：OSD显示叠加透明度， 0-255，0是完全透明。255完全不透明 
+ [red]：OSD字幕颜色RGB分量中的R分量， [green]：OSD字幕颜色RGB分量中的G分量， [blue]：OSD字幕颜色RGB分量中的B分量，
+ [left]：OSD基于视频的显示位置坐标的左上角x轴坐标 [top]：OSD基于视频的显示位置坐标的左上角y轴坐标 [right]：OSD基于视频的显示位置坐标的右下角x轴坐标 [bottom]：
+ OSD基于视频的显示位置坐标的右下角y轴坐标 [strOSD]：OSD字幕
+ 
+ 注意目前ActiveX控件定义一个控件初始化一个唯一的EasyPlayer播放器实例，一个Start对应一个Close函数；Start函数只能调用一次，下一次调用时必然是先Close，再Start；
+ 
+ 
+ 
+ 
+ 
+////////////////////////////////////////////////
+*/
+
+   var close_App=function(){
+   
+      AE.OpenApp( {"emit":"close","Obj":"web","AppId":1});   //关闭Obj":"web","AppId":1的应用
+   }
+ 
+	var init_App=function(){ 
+        //步骤一 初始化
+		 
+		 AE.InitApp(document.getElementById('input_url').value);
+		 
+       
+	  //或者采用回调	
+	//  	  //反馈接口与AE.callbackFunc.equ相等后执行对应的函数，当websocket打开, 再执行AE.callbackFunc.func
+    //      AE.callbackFunc= [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":input_App} //连接websocket成功后，执行input_App
+    //                                     ] ;
+     //       AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1")
+	}
+	   
+   
+	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+        //步骤二 执行
+		    AE.OpenApp(ReqPar);
+			
+	   }
+
+
+  //setTimeout(input_App,3000)
+	   
+
+ 
+	   
+/**   
+* //////////////////////////////////demo easyPlayerRTSP.ocx，再直接打开含有easyPlayerRTSP.ocx object的网页//////////////////////////////////////////////
+//使用"AppType":1IE内核打开ocx对象    "AppType":2 3webkit打开NPAPI对象
+优先级  html>inPar["HttpServer_startUrl"]>inPar["URL"]
+*/
+
+function openRTSP_str(){
+//   还可以使用URL或者HttpServer_startUrl输入  ,<\/script> 加\
+			var htmlStr2=AE.txt2code(function(){/*!@preserve
+			   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+			 <div>
+				 easyPlayerRTSP ，需要注册才能使用。
+					 &nbsp; &nbsp;<button type="button" id="btn_1" onclick="start()" >start</button>&nbsp; &nbsp;
+					  <button type="button" id="btn_2" onclick="stop()" >stop</button>
+				  	<OBJECT ID="EasyPlayerOcx" WIDTH="100%" HEIGHT="94%" CLASSID="CLSID:1EE1C648-F4A9-42F9-9AA7-2C8E3AF7B7FD">
+	
+			       </OBJECT>
+				</div>
+				<script type="text/javascript">
+				 var rtspVar={
+							 url:"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+							 ,rendertype:7
+							 ,name:"admin"
+							 ,password:"admin"
+							 ,harddecode:1
+							 ,rtpovertcp:1
+							 ,cache:3
+							 ,playsound:1
+							 ,showtoscale:1
+							 ,showsatic:1
+							 };
+				  var objRtsp = document.getElementById("EasyPlayerOcx");
+
+			 function start() {
+			 	 
+				objRtsp.Start(rtspVar.url, rtspVar.rendertype, rtspVar.name, rtspVar.password, rtspVar.harddecode,rtspVar.rtpovertcp);
+			 
+				objRtsp.config(rtspVar.cache, rtspVar.playsound, rtspVar.showtoscale, rtspVar.showsatic);
+				
+				// objRtsp.SetOSD(1, 255, 0, 0, 255, 100, 100, 1000, 150, "EasyPlayer-RTSP OSD测试");
+			}			
+			  start();	
+			  
+			function stop() {
+			 
+				objRtsp.Close();
+			}
+	
+		<\/script>
+				
+				
+			*/});
+ 
+            //未提交注册的文件，为了安全，限制为AppEmit文件夹，不能注册或者注销其它文件夹下面的ocx dll,其中 pid唯一
+		 	 ReqPar2= {"emit":"open","Obj":"web","AppType":1,"pos":1,"AppId":1
+			  ,"par":{"URL":null,"htmlStr":htmlStr2,"HttpServer_startUrl":null            //或者"HttpServer_startUrl":"plugins/thirdparty/ffmpeg/easyPlayerRTSP/ocx_test.html"   //使用本地html
+			   ,"embed_object" : {                                     //多个object可以设置embed_object为数组 
+								   "objName":"easyPlayerRTSP"    
+								  ,"pid":"easyPlayerRTSP"   //使用公共插件  pid 名称，  pid 名称是AE共有的，则调用共有的插件                       
+								    ,"reg":true    //null 不执行注册   1强制操作 true 未注册则注册  false 卸载注册 (重启AppEmit后，就不能加载dll了)  
+									,"asAdmin":0   //1需要管理员权限注册 0不需要 ,win7管理员身份会有提示确认窗口
+								   ,"CLASSES_ROOT":"HKEY_CLASSES_ROOT\\EASYPLAYERWEBACT.EasyPlayerWebActCtrl.1\\CLSID"   //可选，reg= true检查是否已经注册,一定要是\\分隔
+								   ,"clsId":"1EE1C648-F4A9-42F9-9AA7-2C8E3AF7B7FD"                           // 可选，reg= true检查是否已经注册
+								 			  
+								 }          //  HKEY_LOCAL_MACHINE\SOFTWARE\Classes\EASYPLAYERWEBACT.EasyPlayerWebActCtrl.1
+				   } 
+			   } ;  
+			   
+		 AE.OpenApp(ReqPar2);	   
+}
+
+
+
+
+
+//调用命令
+  function runcode1(){
+ 
+ 
+    var  cmd22=AE.txt2code(function(){/*!@preserve
+     //AppJsObject.web.doScript('+jscode1+')
+     AppJsObject.web.script.rtspVar.rtpovertcp=0;
+	 AppJsObject.web.script.stop();
+	 AppJsObject.web.script.start();
+     return  {rtpovertcp:AppJsObject.web.script.rtspVar.rtpovertcp}
+  
+*/});
+          //根据  AE.callbackFunc "equ"来回调处理
+       var Req22={"emit":"runCmd","Obj":"web","rid":"cmd_mark1","AppId":1,"codeStr":cmd22 }    //"AppMark":"libvlcLength_mark"
+ 
+      AE.OpenApp(Req22);
+
+}
+ 
+ 
+  
+	
+/////////////////////////
+ 
+</script>
+</body>
+
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 布局方式嵌入APP,  RTSP等视频播放 </title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+ 
+ 	<!-- json2 is included because some browsers doesnt have it (e.g. ie8)	
+	<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+ -->
+   <style type="text/css">
+  .Appboxs {
+  margin-top:10px; display: -webkit-box;     display: -moz-box;  display: -ms-flexbox;  display: -webkit-flex;display: flex; display: box;  display: flexbox;  justify-content:space-around;
+}
+</style>  
+</head>
+
+<body >
+
+
+<div class="container">
+<input type="text" class="form-control" size="50" style="margin-bottom:3px;" id="input_url" value="ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1" />
+     <button type="button" id="btn_Flash" onclick="init_App() " >websocket</button> &nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp; &nbsp; &nbsp; &nbsp;<a href="index.html" target="_blank">hardware Demo</a> &nbsp; &nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed</a>&nbsp; &nbsp;<a href="office.html" target="_blank">PDF_Office</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a>&nbsp; &nbsp;<a href="http://www.appemit.com" target="_blank">Homepage</a> &nbsp;  &nbsp; <a href="../login.html" target="_blank">Register</a> 
+      <div >  
+		<div style="font-size:10px">一个界面布局多个
+			 
+ <input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value=''/>
+	 
+		 <button type="button" id="btn_1" onclick="input_App() " >do it</button> 
+			 <button type="button" id="btn3 " onclick="open_apps() " >open_apps</button> 
+   <button type="button" id="btn3 " onclick="runcode1() " >运行code访问对象</button> 
+ <button type="button" id="btn_2" onclick="libvlc_snap() " >调用函数libvlc_snap</button>
+  <button type="button" id="btn_2" onclick="open_4webs() " >打开4个APP</button>
+   <button type="button" id="btn_2" onclick="runcode22() " >切换第2个APP</button>
+ 
+		</div>
+		
+	   <div style="font-size:10px">close  :  {"emit":"close","Obj":"layApp","AppId":1}           &nbsp;  &nbsp; &nbsp;      or   &nbsp;   &nbsp; {"emit":"closeAll","Obj":"layApp"}</div>      
+
+
+<!--  .Appboxs {
+                margin: 0 30px 0 260px;
+                padding: 40px 0 0 0;
+                position:absolute;绝对
+                top: 30px; 固定上部
+                left: 3%; 左边留成百分比
+                width:1200px;宽度固定
+                }
+ 
+当左右拉动放大缩小浏览器时，不会变化。
+ -->
+ 
+		   </div>
+             <div class="Appboxs" >
+			 
+			 <!--    textarea或者改为div  都可以,绑定嵌入APP的位置, AppEmbed 要一致。如果要跟随浏览器变化大小，设置相对%比例即可-->
+ 		    <div id="AppEmbed1"  style="border: solid 1px #F0F0F0; min-width:30px;min-height:20px;width:800px;height:480px" ></div>
+	         
+		</div>
+	 
+              <div style=" margin-left:1200px; margin-top:1200px;text-align:center ">
+			     测试滚动 
+		</div>  
+</div>
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>
+ 
+<script>
+
+ /**
+  直接在一个总GUI上面加载多个应用布局, 或者使用web.html 直接在html写多个object网页来加载。
+  注意：先关闭以前打开的等待一下，再重新打开APP。要不直接打开会遇到前面的关闭过程还没有完成。
+ 不同布局举例480*780，主要是设置位置和自适应各边的边距变化，dl 左边 dt 顶部 dr右边 db底部 ，1表示固定边距，0禁用固定,具体数值表示边距百分比
+ 如果比例不变也可以就按这个尺寸设置，会自动适应。
+ //bgcolor #ffffff 可以设置背景颜色，image设置背景jpg图片 
+ 
+//1*2	
+ {"left":0,"top":0,"right":375,"bottom":480,"dl":1,"dt":1,"dr":0.52,"db":1}
+ ,{"left":405,"top":0,"right":780,"bottom":480,"dl":0.52,"dt":1,"dr":1,"db":1}
+ 
+//1*3
+ 
+ {"left":0,"top":0,"right":250,"bottom":480,"dl":1,"dt":1,"dr":0.68,"db":1}
+ ,{"left":265,"top":0,"right":515,"bottom":480,"dl":0.34,"dt":1,"dr":0.34,"db":1}
+ ,{"left":530,"top":0,"right":780,"bottom":480,"dl":0.68,"dt":1,"dr":1,"db":1}
+ 
+ //2*2
+ {"left":0,"top":0,"right":370,"bottom":235,"db":0.51,"dl":1,"dr":0.53,"dt":1}
+,{"left":410,"top":0,"right":780,"bottom":235,"db":0.51,"dl":0.53,"dr":1,"dt":1}
+,{"left":0,"top":245,"right":370,"bottom":480,"db":1,"dl":1,"dr":0.53,"dt":0.51}
+,{"left":410,"top":245,"right":780,"bottom":480,"db":1,"dl":0.53,"dr":1,"dt":0.51}
+
+ 
+//2*3
+ {"left":0,"top":0,"right":250,"bottom":235,"db":0.51,"dl":1,"dr":0.68,"dt":1}
+,{"left":265,"top":0,"right":515,"bottom":235,"db":0.51,"dl":0.34,"dr":0.34,"dt":1}
+,{"left":530,"top":0,"right":780,"bottom":235,"db":0.51,"dl":0.68,"dr":1,"dt":1}
+,{"left":0,"top":245,"right":250,"bottom":480,"db":1,"dl":1,"dr":0.68,"dt":0.51}
+,{"left":265,"top":245,"right":515,"bottom":480,"db":1,"dl":0.34,"dr":0.34,"dt":0.51}
+,{"left":530,"top":245,"right":780,"bottom":480,"db":1,"dl":0.68,"dr":1,"dt":0.51}
+
+ 
+//3*3
+ {"left":0,"top":0,"right":250,"bottom":150,"db":0.69,"dl":1,"dr":0.68,"dt":1}
+,{"left":265,"top":0,"right":515,"bottom":150,"db":0.69,"dl":0.34,"dr":0.34,"dt":1}
+,{"left":530,"top":0,"right":780,"bottom":149,"db":0.69,"dl":0.68,"dr":1,"dt":1}
+,{"left":0,"top":165,"right":250,"bottom":315,"db":0.34,"dl":1,"dr":0.68,"dt":0.34}
+,{"left":265,"top":165,"right":515,"bottom":315,"db":0.34,"dl":0.34,"dr":0.34,"dt":0.34}
+,{"left":530,"top":165,"right":780,"bottom":315,"db":0.34,"dl":0.68,"dr":1,"dt":0.34}
+,{"left":0,"top":330,"right":250,"bottom":480,"db":1,"dl":1,"dr":0.68,"dt":0.69}
+,{"left":265,"top":330,"right":515,"bottom":480,"db":1,"dl":0.34,"dr":0.34,"dt":0.69}
+,{"left":530,"top":330,"right":780,"bottom":480,"db":1,"dl":0.68,"dr":1,"dt":0.69}
+
+**/
+
+  
+  var webMp4_demo1="https://cdn.jsdelivr.net/gh/appemit/AppEmitWeb@master/docs/demo/file/n1.mp4"
+  var webRtsp_demo2="rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+  var mp4_demo0="/demo/htmlDemo/file/q1.mp4"
+  	var eventAll=["click","Rclick","resume","play","pause","stop","end","volume","mute","fullscreen","Error","LengthChanged","trackbar","close"] 
+	var init_App=function(){   
+		AE.InitApp(document.getElementById('input_url').value);
+	
+	}
+ var input_App= function( ){    
+  
+	    var  Req0=JSON.parse(document.getElementById("input_par").value);
+		  if (Req0)  AE.OpenApp(Req0);
+	}	   
+		   
+	var  open_apps=function(){  
+
+	 //canvas 和src 一一对应
+	   var  Req12={"emit":"open","Obj":"layApp","AppType":1,"pos":1,"AppId":1
+ 					 
+	                     ,"src":[                //加载对应的具体APP的参数 
+	                            {"Obj":"libvlc","AppType":1,"AppId":1, "canvas": {"left":0,"top":0,"right":375,"bottom":480,"dl":1,"dt":1,"dr":0.52,"db":1},"par":{"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0,"event":eventAll,"fullscreen":1,"volume":70,"autoplay":1,"controls":1,"bgcolor":"2A2937"}}
+	                          , {"Obj":"libvlc","AppType":1,"AppId":2, "canvas": {"left":405,"top":0,"right":780,"bottom":480,"dl":0.52,"dt":1,"dr":1,"db":1},"par":{"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0,"event":eventAll,"fullscreen":1,"volume":70,"autoplay":1,"controls":1,"bgcolor":"2A2937"}}
+		                 																	
+	                           ]
+							   ,"par0":{"bgcolor":"5a5a5a"}  //layApp的参数
+				   }
+	  
+        AE.OpenApp(Req12);
+	  
+	}
+
+   
+ //控制vlc///////////////////////////////////////////////////////////
+ callback2= function(Jdata,inPar){
+      //业务处理，获得cmd1的运行结果
+   if (Jdata.data ) {
+     console.log("处理业务数据",Jdata.data )
+   
+   }
+ 
+ }
+
+   //回调函数，如果equ有多个反馈同时相等，都会回调。要确保唯一，可以指定rid或者AppMark
+    AE.callbackFunc= [ 
+	                              {"equ": { "Obj":"libvlc", "rid": "libvlc_mark1" ,"rep": 0},"func":callback2, "inPar":null} //测试
+								  ] ;  
+								   
+ 
+ 
+ function runcode1(){
+ var  cmd1=AE.txt2code(function(){/*!@preserve
+  // 
+     return  { length:AppJsObject.libvlc.length,state:AppJsObject.libvlc.state}
+   
+*/});
+     //增加特殊的回调相等字段, 这里需要指定child来确定具体的APP
+       var Req={"emit":"runCmd","Obj":"layApp","rid":"libvlc_mark1","AppId":1,"child":{"objName":"libvlc","AppId":1},"codeStr":cmd1 }    //"AppMark":"libvlcLength_mark"
+	 AE.OpenApp(Req);
+ 
+}
+
+  function libvlc_snap(){   
+  
+ 
+     var snapPath="/file/snap/a_"+Date.now()+".bmp"
+            var  ReqPar8={"emit":"runCall","Obj":"layApp","child":{"objName":"libvlc","AppId":1},"AppId":1,"AppMark":"sdfdAppMark","par":{"callFun":{"takeSnap":[snapPath,0,0,0]}}  }	   
+           AE.OpenApp(ReqPar8);
+ }
+ 
+ 	var  open_4webs=function(){  
+	 	 //canvas 和src 一一对应
+	   var  Req12={"emit":"open","Obj":"layApp","AppType":1,"pos":1,"AppId":1
+	 				   
+	                     ,"src":[                //加载对应的具体APP的参数  
+	                            {"Obj":"web","AppType":1,"AppId":1, "canvas": {"left":0,"top":0,"right":370,"bottom":235,"db":0.51,"dl":1,"dr":0.53,"dt":1},"par":{"URL":"http://www.baidu.com","htmlStr":null,"HttpServer_startUrl":null}  }
+                              ,{"Obj":"web","AppType":1,"AppId":2 ,"canvas": {"left":410,"top":0,"right":780,"bottom":235,"db":0.51,"dl":0.53,"dr":1,"dt":1},"par":{"URL":"http://www.baidu.com","htmlStr":null,"HttpServer_startUrl":null }  }                        
+                              ,{"Obj":"web","AppType":1,"AppId":3 ,"canvas": {"left":0,"top":245,"right":370,"bottom":480,"db":1,"dl":1,"dr":0.53,"dt":0.51},"par":{"URL":"http://www.baidu.com","htmlStr":null,"HttpServer_startUrl":null,"btnClose":1}  }	                         
+							  , {"Obj":"libvlc","AppType":1,"AppId":4 ,"canvas": {"left":410,"top":245,"right":780,"bottom":480,"db":1,"dl":0.53,"dr":1,"dt":0.51},"par":{"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0,"event":eventAll,"fullscreen":1,"volume":70,"autoplay":1,"controls":1,"bgcolor":"2A2937","btnClose":1}}
+		                 																	
+	                           ]
+							   ,"par0":{"bgcolor":"ffffff"}  //layApp的参数
+				   }
+	  
+        AE.OpenApp(Req12);
+	  
+	}
+	
+// 第2个切换
+ function runcode22(){
+ var  cmd22=AE.txt2code(function(){/*!@preserve
+  // 这种需要 访问 layApp  ,这里运行代码的数据都是table{;}。
+   AppJsObject.layApp.close({1;3}) ;  //关闭第1，3个
+   var newSrc_vlc={
+                     {"Obj":"libvlc","AppType":1,"AppId":2,"par":{"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0,"bgcolor":"2A2937"}}
+                    ,{"Obj":"libvlc","AppType":1,"AppId":3,"par":{"mrl":"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov","localFile":0,"bgcolor":"2A2937"}}
+                    }
+   AppJsObject.layApp.open(newSrc_vlc,{2;3})   //会先自动关闭，再重新打开序号第2,3个的APP  。
+  return  { state:1}
+   
+*/});
+     //增加特殊的回调相等字段, 这里需要指定child来确定具体的APP
+       var Req={"emit":"runCmd","Obj":"layApp","rid":"libvlc_mark22","AppId":1, "codeStr":cmd22 }    //"AppMark":"libvlcLength_mark"
+	 AE.OpenApp(Req);
+ 
+}
+	
+	
+	
+</script>
+</body>
+
+</html>

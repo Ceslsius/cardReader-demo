@@ -1,0 +1,121 @@
+[AppEmit
+,appemit
+,
+,
+,
+,
+,userName
+,"type"
+,password
+,"set  fields in order, which has English commas,  the quotation marks required"
+,Tips
+,"modify config hosts, the IP address  incorrect "
+,here after minimization
+,monitoring equipment
+,USB flash drive open
+,USB flash disk  closed
+,the serial port  occupied
+,serial port
+,specify the save location and file name
+,new operation
+,new label
+,send file
+,byte
+,sent successfully
+,login succeeded
+,user name or password error
+,user name already registered
+,the two passwords are different
+,incorrect verification code
+,"currently using [extranet]"
+,"Has been set to use [LAN]."
+,update succeeded
+,"the original password or network is incorrect, update failed"
+,enter password
+,update product and plug-in data
+,update failed
+,input error
+,"the first test record cannot be deleted"
+,save error
+,maximum number
+,password  incorrect
+,My app
+,Account
+,configuration
+,Pay
+,Publish
+,Captcha
+,register
+,cancel
+,"agree  to comply"
+,"(appemit user terms of service)"
+,mobile / email *
+,login
+,Password *
+,Confirm password *
+,"identity type"
+,request version type
+,company name
+,your name
+,record  password
+,login on
+,account(moblie/email)
+,update local product and plugin data in force
+,Random GUID
+,file sha1
+,before Public
+,Delete
+,Add
+,modify
+,OK
+,Reset pid
+,Save
+,get file sha1
+,user UID
+,AuthKey
+,plguin name
+,version
+,dllfile path
+,dllfile name
+,Reset AuthKey
+,file not found
+,"SHA1 should be checked before calling dllfile. After updating DLL, it also needs to be updated here."
+,"false: the file will not be verified. If the file is too large, it can not be verified considering performance problems."
+,plugin PID (GUID CLSID)
+,DLL file SHA1
+,add new
+,"set the company product CID and client clientkey, and the cryptkey of OTP (used on server)"
+,"set the DLL's PID (GUID, CLSID) and authkey of plugins such as development "
+,set company product CID (max 
+,")and client clientkey, cryptokey of OTP (used on server) "
+,"tip: Don't modify them easily. There will be several hours of delay in updating"
+,"open,valid"
+,"close,revoke"
+,Reset clientKey
+,Reset cryptKey
+,valid
+,cryptKey OTP
+,information
+,contact
+,old password*
+,Don't modify it at will
+,new password*
+,Paid users can be authorized.Email contact.
+,QQ Friend
+,no paid
+,paid user
+,Welcome UID
+,Run
+,delete all files SHA1
+,drag the EXE file SHA1
+,enable LAN
+,LAN started
+,LAN turned off
+,modified data
+,original data
+,"The LAN been setted up. update status after retart."
+,"days left for start the EXE function test "
+,"www network  been restored. update status after retart"
+,all files
+,No permission
+]

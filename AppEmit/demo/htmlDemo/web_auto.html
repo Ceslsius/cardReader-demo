@@ -1,0 +1,84 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit 嵌入APP,dll Ocx支持播放flash的flv swf 以及RTSP等视频播放，可以嵌入各类程序</title>
+	   <meta name="description" content="轻量级中间件">
+	<meta name="keywords" content=" Embed App,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+ <!-- <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script> -->
+   <style type="text/css">
+  .Appboxs {
+    margin-top:10px;
+     justify-content:space-around;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex
+    display: flex;
+   	display: box;
+    display: flexbox;
+}
+</style>
+</head>
+
+<body >
+<div class="container">
+		   </div>
+             <div class="Appboxs" >
+ 		     <div id="AppEmbed1"  style="	border: solid 2px #F0F0F0; min-width:30px;min-height:20px;width:80%;height:500px" ></div>
+		</div>
+              <div style=" margin-left:1800px; margin-top:1800px;text-align:center ">
+			     Test
+		</div>
+</div>
+ 
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+<script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+ 
+ 
+   //打开网页自动连接appemit
+   var close_App=function(){
+
+      AE.OpenApp( {"emit":"close","Obj":"web","AppId":1});
+   }
+	var init_App=function(){
+	// 初始化后，根据equ条件来执行任务
+           AE.callbackFunc=  [{"equ": { "service":AE.service, "rid": 0,"clientAuth":1,"rep": 0},"func":input_App}  
+		                        , {"equ": { "AppStatus":1, "Obj":"web", "rid": 1,service: "appemit","rep": 0},"func":input_App2}
+								]
+ 
+          // AE.InitApp("ws://localhost:80/appemit?cid=00000-1&sid=1&flag=1")
+		  AE.InitApp()
+	}
+	var input_App= function(Jdata){  //回调的数据Jdata
+	//本地HttpServer_startUrl  web使用URL
+	      
+
+
+		 // console.log(11111111,Jdata)  // 后续可以通过判断自己设置的data里面的标记来做对应的操作
+		 var ReqPar={"emit":"open","Obj":"web","AppType":1,"AppId":1,"pos":1,"par":{"AppMark":1,"htmlStr":null,"HttpServer_startUrl":"/demo/htmlDemo/webPdf.html","URL":null}};
+		    AE.OpenApp(ReqPar);
+
+	   }
+  
+	 
+     var input_App2= function(Jdata){  //回调的数据Jdata
+	 
+	    //  console.log(2222,Jdata)  // 后续可以通过判断自己设置的data里面的标记来做对应的操作
+	 
+	  }
+	  
+    init_App();
+	
+	
+
+ 
+</script>
+
+
+</body>
+
+</html>

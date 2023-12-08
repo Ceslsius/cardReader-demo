@@ -1,0 +1,429 @@
+<!DOCTYPE html>  <!--  manifest="/websocket.appcache"-->
+<html >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title> AppEmit  cad  </title>  
+	   <meta name="description" content=" AppEmit是应用程序（尤其是浏览器）与本地程序间互相通信的易扩展的轻量级中间件">
+	<meta name="keywords" content=" Embed App,游戏,办公,websocket,SSL,RTSP,plugins,flash,mp4,flv,swf, m3u8,rtmp,mp3,aac">
+
+    <script type="text/javascript">
+    </script>
+      <style type="text/css">
+        html,body{
+            height: 100%;
+	      width:100%
+        }
+    body{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+     <div style="font-size:10px">1 .cad
+				<input type="text" class="form-control" size="90" style="margin-bottom:3px;" id="input_par" value='{"emit":"open","Obj":"cad","AppType":1,"AppFollow":31,"src":"/demo/htmlDemo/file/cad1.dwg","pos":1,"par0":{"progId":["AutoCAD.Application"],"objName":"autocad","embed":-1,"AppMethod":"POST","HttpPost":{"URL":"http://eu.httpbin.org/post","valid":0,"fileName":"newcad1.dwg" },"show_UpdateTool":true}}'/>
+		   	<button type="button" id="btn_Flash" onclick="input_App() " >do it</button>&nbsp; &nbsp;<a href="web.html" target="_blank">web</a>&nbsp;&nbsp;<a href="AppEmbed.html" target="_blank">AppEmbed  </a> &nbsp; &nbsp;<a href="rtsp.html" target="_blank">rtsp</a>&nbsp; &nbsp;<a href="dll.html" target="_blank">DLL</a> &nbsp; &nbsp;<a href="index.html" target="_blank">index</a> 
+		   </div>
+		    <button type="button" id="btn2" onclick="step() " >测试调用过程</button>  
+          <div style="font-size:10px"> 2.打开网络，默认保存上传  {"emit":"open","Obj":"cad","AppType":1,"AppFollow":31,"src":[["https://cdn.jsdelivr.net/gh/appemit/AppemitWeb@master/docs/demo/file/cad2.dwgtmp","cad2.dwg"]],"pos":1,"par0":{"objName":"autocad","embed":-1,"AppMethod":"POST","HttpPost":{"URL":"http://eu.httpbin.org/post","valid":1,"fileName":"newcad2.dwg" },"show_UpdateTool":true}}                                                                                             
+	 <div style="font-size:10px">   <button type="button" id="btn2" onclick="IsQuiescent() " >是否静止IsQuiescent</button>  </div>
+	 <button type="button" id="btn2" onclick="cmd_line() " >画一条线cmd_line</button>  
+    <button type="button" id="btn2" onclick="DoCommands() " >DoCommands</button>
+ <button type="button" id="btn2" onclick="get_file() " >获得激活文档属性</button>
+ 
+ 
+   <button type="button" id="btn2" onclick="UploadFile() " >推荐手动上传</button> 
+     <button type="button" id="btn2" onclick='AE.OpenApp({"emit":"close","Obj":"cad","AppId":1,"par0":{"AppMethod":"POST"}}) ' >关闭</button> 
+   
+     <div style="font-size:10px">  close : {"emit":"close","Obj":"cad","AppId":1,"par0":{"AppMethod":"POST"}}       or     {"emit":"closeAll","Obj":"cad","par0":{"AppMethod":"POST"}}  </div>
+</div>
+
+ <div readonly id="AppEmbed1"  style="border:none; 	width:100%;height:600px" ></div>
+	 
+ 
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/pako/1.0.11/pako.min.js"></script>    如果使用Gzip压缩解压数据，则需要引入-->
+  <script type="text/javascript" src="AppEmit_1.2_min.js"></script>  
+<script>
+/**
+
+  //inPar["src"]={"demo/htmlDemo/file/cad1.dwg"}
+ // inPar["src"]={{"https://cdn.jsdelivr.net/gh/appemit/AppemitWeb@master/docs/demo/file/cad1.dwg";"cad1.dwg"}}
+ 
+  
+  
+  AutoCAD 接口文档: https://help.autodesk.com/view/OARX/2020/PLK/?guid=GUID-A809CD71-4655-44E2-B674-1FE200B9FE30
+  
+   1 默认 AutoCAD的pra0:{"progId":["AutoCAD.Application","GStarCAD.Application"]}，调用上一次打开autoCAD的版本。全局变量 对象  AppJsObject     AppJsObject.objName 访问实例对象,默认autocad则为 AppJsObject.autocad 访问
+     不同版本的progId不同，可以调用指定对应的版本，具体可以在regedit注册表中可以查询到。
+		AutoCAD2010 AutoCAD.Application.18
+		AutoCAD2011 AutoCAD.Application.18.1
+		AutoCAD2012 AutoCAD.Application.18.2
+		AutoCAD2013 AutoCAD.Application.19
+		AutoCAD2014 AutoCAD.Application.19.1
+		AutoCAD2015 AutoCAD.Application.20
+		AutoCAD2016 AutoCAD.Application.20.btclose
+		AutoCAD2017 AutoCAD.Application.21
+		AutoCAD2019 AutoCAD.Application.22
+		AutoCAD2020 AutoCAD.Application.23.1
+		AutoCAD2021 AutoCAD.Application.24
+   2 AppJsObject.autocad.SendCommand(lispCmds)   同步命令  AppJsObject.autocad.PostCommand(lispCmds)   异步命令
+        可以执行 AutoCAD 里所有命令以及 AutoLISP 表达式，跟在 AutoCAD 里输入命令效果一样。
+   3  autocad命令默认是同步，需要增加"AppMethod":"POST"来传递消息机制
+   4   常用对象 AppJsObject.autocad.ActiveDocument.ModelSpace  AppJsObject.autocad.ActiveDocument.Utility
+*/
+  
+	    var init_mark=  AE.InitApp("ws://localhost:80/appemit?cid=00000-1&flag=1");
+ 
+ 	//cad
+ 	var input_App= function(Jdata){    //回调的数据Jdata
+ 
+	      var ReqPar={};
+	       ReqPar=JSON.parse(document.getElementById("input_par").value);
+		   AE.OpenApp(ReqPar);
+
+  }
+ 
+ //调用
+  step=function(){
+  //回调通过equ判断反馈，执行对应的函数,还可以添加AppMark ,rid来区分，"rep": 0表示没有错误
+   		  AE.callbackFunc= [{"equ": { "Obj":"cad" ,"AppStatus":1,"rep": 0,"service":AE.service} ,"func":function(Jdata){console.log(" 启动",Jdata)}} //  
+		                              , {"equ": { "Obj":"cad" ,"AppMark":"IsQuiescent","rep": 0} ,"func":function(Jdata){console.log(2222,Jdata)}} // 
+								    , {"equ": { "Obj":"cad","AppMark":"upload" } ,"func":function(Jdata){console.log("上传判断",Jdata.UploadStatus)}} // 
+										    , {"equ": { "Obj":"cad","AppMark":"getFullName" } ,"func":function(Jdata){console.log("回调属性",Jdata)}} // 
+		                              , {"equ": { "Obj":"cad" ,"AppStatus":0,"rep": 0} ,"func":function(Jdata){console.log("关闭",Jdata)}} //  关闭
+                                   //   , {"equ": { "Obj":"autocad" ,"rid":2},"func":function(){AE.callbackFun_cancel=true;}} // 可以取消回调
+										] ;
+   	 
+	 ReqPar2=	{"emit":"open","Obj":"cad","AppType":1,"AppFollow":31,"src":"/demo/htmlDemo/file/cad1.dwg"
+	 ,"pos":1
+	  ,"par0":{"progId":["AutoCAD.Application"]   //上一次打开的版本
+	 ,"objName":"autocad"
+	 ,"embed":1             //-1浮动模式   1嵌入模式
+	 ,"filePar":[true,null]    //打开文件方式  只读 ，密码
+	 ,"noCaption":30     //0 显示标题栏，默认"embed":1 时，屏蔽30高度的标题栏
+	 ,"AppMethod":"POST"       //消息传递方式
+	 , "AppStep":{"init":null, "destroy":"return {mark:'destroy'}", "closed":null
+						  ,"loaded":"if (AppJsObject.autocad) {return {name:AppJsObject.autocad.name,mark:'loaded'};}"}    //在对应的阶段执行默认的操作
+
+	 ,"HttpPost":{"URL":"http://eu.httpbin.org/post","valid":0,"fileName":"newcad2.dwg" }   //valid:1和URL来控制关闭时（destroy后close前） 是否上传，如果没有名称则命名"newcad2.dwg"
+	 ,"show_UpdateTool":true}}
+  
+	   	   AE.OpenApp(ReqPar2);
+} 
+ 
+ /////////操作autocad对象//////////////////////////////////////////////
+ UploadFile=function(){
+  //上传 AppJsObject.autocad.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1})  AppJsObject.autocad.ActiveDocument.Save();
+ 	   /*  还可以在par0追加上传参数 URL=   //"http://eu.httpbin.org/post" ;method= 默认"POST" /"GET ";username	;password;cookie*/
+ 	  var Req={"emit":"runCmd","Obj":"cad","AppId":1,"AppMark":"upload","codeStr":'AppJsObject.autocad.UploadFile({"URL":"http://eu.httpbin.org/post","valid":1,"SaveAs":1,"fileName":"w222.dxf"}); ' ,"par0":{"AppMethod":"POST"}}   
+  
+      AE.OpenApp( Req );
+ 
+ }
+
+//GetAcadState().IsQuiescent  
+IsQuiescent=function(){
+     //反馈是否为静止状态
+ 	 var Req={"emit":"runCmd","Obj":"cad","AppId":1,"AppMark":"IsQuiescent","codeStr":'return AppJsObject.autocad.GetAcadState().IsQuiescent' ,"par0":{"AppMethod":"POST"}}   
+	 //  var Req={"emit":"runCmd","Obj":"cad","AppId":1,"codeStr":'return AppJsObject.autocad.GetState()' ,"par0":{"AppMethod":"POST"}}   
+ 
+      AE.OpenApp( Req );
+ 
+ }
+//发送命令
+DoCommands=function(){
+  //AppJsObject.autocad.SendCommand(lispCmds)   同步命令;  AppJsObject.autocad.PostCommand(lispCmds)   异步命令
+  //  为了兼容IE使用下面的函数AE.txt2code(function(){/*!@preserve   */})转为字符串，要是不考虑IE，可以使用``来确定js的字符串
+  //这里面注意`引用执行代码
+  var cmd1= AE.txt2code(function(){/*!@preserve
+`(setq c:hello nil)
+(defun c:hello(/ name)
+(set 'name (getstring "What's your name? "))
+(set 'msg (strcat "Hello, " name <?= time(),"这是 js调用" ?>))
+(write-line msg))
+hello`
+*/});
+
+ 	  var Req={"emit":"runCmd","Obj":"cad","AppId":1,"codeStr":'AppJsObject.autocad.PostCommand('+cmd1+')' ,"par0":{"AppMethod":"POST"} } 
+  
+      AE.OpenApp( Req );
+ 
+ }
+ 
+//获取属性
+ get_file =function(){
+ //获取激活文档的属性
+var	codeStr5 =   AE.txt2code(function(){/*!@preserve
+ if  AppJsObject.autocad && AppJsObject.autocad.ActiveDocument  {
+      return {Name :AppJsObject.autocad.ActiveDocument.Name,Path:AppJsObject.autocad.ActiveDocument.Path,FullName:AppJsObject.autocad.ActiveDocument.FullName}
+ }
+*/});
+ 
+ 
+   var  Req5={"emit":"runCmd","Obj":"cad","AppId":1,"AppMark":"getFullName","codeStr":codeStr5,"par0":{"AppMethod":"POST"} }   
+  
+
+      AE.OpenApp( Req5 );
+
+} 
+
+cmd_line =function(){
+ //通过 AppJsObject.autocad 来调用来调用autocad,也可以定义一个 var cad=AppJsObject.autocad; 用cad来缩写
+
+   //注意 结尾一定要有;  或者\r\n 
+  //vue需要使用 AE.txt2code_Vue
+var	codeStr1 =   AE.txt2code(function(){/*!@preserve
+AppJsObject.autocad.ActiveDocument.ModelSpace.AddText("测试文本",{10;20;30},5);
+
+var pt1 = AppJsObject.autocad.ActiveDocument.Utility.GetPoint(,'\r\n请选择第一点: ');
+var pt2 = AppJsObject.autocad.ActiveDocument.Utility.GetPoint(,'\r\n请选择第二点: ');
+AppJsObject.autocad.ActiveDocument.ModelSpace.AddLine(pt1,pt2);
+*/});
+ 
+ 
+   var  Req3={"emit":"runCmd","Obj":"cad","AppId":1,"codeStr":codeStr1,"par0":{"AppMethod":"POST"} }   
+  
+
+      AE.OpenApp( Req3 );
+
+}
+
+ /**
+ 
+ appemit数值数组传入 COM 默认为 double 类型数组，
+单个数值，整数默认为 32 位整型（int），小数默认为 64 位浮点数（ double ）。 
+字符串或字符串数组默认为 BSTR 类型。
+
+AutoCAD 有些数值或数组参数不使用上述的默认类型，
+ 提供了以下函数可以明确的声明 COM 参数的类型：
+-------------------------------------------------------------------
+com.byte() 将参数指定的数值或数组声明为 8 位整型数值。
+com.ubyte()  将参数指定的数值或数组声明为 8 位无符号整型数值。
+com.word() 将参数指定的数值或数组声明为 16 位整型数值。
+com.uword() 将参数指定的数值或数组声明为 16 位无符号整型数值。
+com.int() 将参数指定的数值或数组声明为 32 位整型数值。
+com.uint() 将参数指定的数值或数组声明为 32 位无符号整型数值。
+com.long() 将参数指定的数值或数组声明为 64 位整型数值。
+com.ulong() 将参数指定的数值或数组声明为 64 位无符号整型数值。
+com.float() 将参数指定的数值或数组声明为 32 位浮点数值。
+com.double() 将参数指定的数值或数组声明为 64 位浮点数值。
+com.Variant() 将参数指定的值或数组声明为变体类型。
+-------------------------------------------------------------------
+要注意不同编程语言之间的差别： 
+VB6/VBA 中 Integer 是16位数值，Long 是32位数值，
+而在 C# 中 int 是32位数值, long 是64位数值，
+更重要的不是类型名字，而是存储长度
+
+AppJsObject.autocad的属性、方法
+
+Visible = 是否显示 AutoCAD 窗口。\n此值建议设置为 true 以显示窗口，\n不显示窗口有些功能可能用不了。
+ShowForeground() = 前置并显示 AutoCAD 窗口。
+Documents = 当前文档数组,不显示窗口可能为 null。\n这是通过 COM 接口访问的类数组对象，起始下标为 0 而不是 1，\n只能使用 Count 获取数组长度，不能用 # 操作符获取数组长度
+Documents.Count = 打开文档总数
+Documents.? = !stdComCadDoc.
+ActiveDocument = 当前活动文档\n!stdComCadDoc.
+LoadLisp( = 加载 LISP 代码\n[参数支持模板语法](chm://the%20language/template_syntax.html)
+LoadLisp(.(lisp,args,doc) = 加载 LISP 代码，\n参数@1可以是文件、资源文件、或 LISP代码\n已加载的 lisp 代码无法卸载，\n可通过LIST赋值删除定义的函数，例如 (setq c:hello nil)\n\n支持  模板语法,模板中非数值、布尔值一律转字符串,\n一次输出多个模板参数或数组参数时,字符串自动加引号,多参数自动以空格分开,\n可选用 @args 参数指定模板 owner 参数，\n可选用参数 @3 自定义执行此函数的文档对象
+LoadLispFile( = 加载 *.lsp 代码文件
+LoadLispFile(.(path,doc) = 加载 *.lsp 代码文件，\n参数@1指定 *.lsp 代码文件路径，\n可选用参数 @2 自定义执行此函数的文档对象
+NetLoad( = 加载 .Net DLL
+NetLoad(.(path,doc) = 加载 .Net DLL，\n参数@1指定 *.dll 文件路径，\n可选用参数 @2 自定义执行此函数的文档对象
+SendCommand( = 同步发送 AutoCAD 命令\n[参数支持  模板语法](chm://the%20language/template_syntax.html)
+SendCommand(.(cmd,args,doc) = 同步发送 AutoCAD 命令，\n参数@1可以是文件、资源文件、LISP 表达式、命令，\n每句命令应以空格或回车结束,\n尾部的回车可省略\n\n支持  模板语法,模板中非数值、布尔值一律转字符串,\n一次输出多个模板参数时,字符串自动加引号,多参数自动以空格分开,\n可选用 @args 参数指定模板 owner 参数，\n可选用参数 @3 自定义执行此函数的文档对象
+PostCommand( = 异步发送 AutoCAD 命令\n[参数支持  模板语法](chm://the%20language/template_syntax.html)
+PostCommand(.(cmd,args,doc) = 异步发送 AutoCAD 命令，\n参数@1可以是文件、资源文件、LISP 表达式、命令，\n每句命令应以空格或回车结束,\n尾部的回车可省略\n\n支持  模板语法,模板中非数值、布尔值一律转字符串,\n一次输出多个模板参数时,字符串自动加引号,多参数自动以空格分开,\n可选用 @args 参数指定模板 owner 参数，\n可选用参数 @3 自定义执行此函数的文档对象
+GetAcadState().IsQuiescent = AutoCAD 当前是静止状态
+MajorVersion() = AutoCAD 主版本号,\n例如 AutoCAD 2022 主版本号为 24
+GetInterfaceObject(__)  = 使用参数指定的 ProgID 在 AutoCAD 进程内加载 COM 对象
+GetCadInterfaceObject(__) = 使用参数指定的 ProgID 在 AutoCAD 进程内加载 AutoCAD 提供的 COM 对象,\n与 GetInterfaceObject 不同的是 GetCadInterfaceObject 会在参数后自动添加当前主版本号
+GetLayerStateManager() = 获取 AutoCAD 进程内图层管理器对象
+GetAcCmColor() = 获取 AutoCAD 进程内颜色管理对象
+GetSecurityParams = 获取 AutoCAD 进程内安全参数对象
+Eval(__) = 计算 VBA 表达式 
+Quit() = 退出应用程序
+LoadARX(__) = 加载参数@1指定的 ARX 应用程序
+ListARX() =  获取已加载的 ARX 应用程序
+UnloadARX(__) =  卸载参数@1指定的 ARX 应用程序
+Application = 应用程序对象
+SendCopyData(.(data,args,dataType) = 用 _WM_COPYDATA 向 AutoCAD 窗口发送数据。\n@data 为 需要发送的字符串，发送命令时支持模板语法，\n@args 发送命令时，可选用这个参数指定@data 使用的模板参数，\n@dataType 省略时默认值为1，为 1 表示发送到 AutoCAD 命令窗口并执行该命令。\n发送成功返回1，否则返回0
+HWND = 窗口句柄
+Path = AutoCAD 安装目录
+ 
+ */
+
+//AppJsObject.autocad 的属性和方法
+/**
+  Visible _get
+  Visible(bool)
+  Name _get
+  Caption _get
+  Application _get
+  ActiveDocument _get
+  ActiveDocument(pointer)
+  FullName _get
+  Height _get
+  Height(int)
+  WindowLeft _get
+  WindowLeft(int)
+  Path _get
+  LocaleId _get
+  WindowTop _get
+  WindowTop(int)
+  Version _get
+  Width _get
+  Width(int)
+  Preferences _get
+ StatusId _get  
+ ListArx()
+ LoadArx(string)
+ GetInterfaceObject(string)
+ UnloadArx(string)
+ Update()
+ Quit()
+  Zoom(int, pointer)
+  VBE _get
+  MenuGroups _get
+  MenuBar _get
+  LoadDVB(string)
+  UnloadDVB(string)
+ Documents _get
+ Eval(string)
+ WindowState _get
+ WindowState(pointer)
+ RunMacro(string)
+ ZoomExtents()
+ ZoomAll()
+ ZoomCenter(pointer, double)
+ ZoomScaled(double, pointer)
+ ZoomWindow(pointer, pointer)
+ ZoomPickWindow()
+  GetAcadState()
+  ZoomPrevious()
+  HWND _get
+
+ShowForeground()
+UploadFile()
+SendCommand()
+NewFile()
+LoadLispFile()
+LoadLisp()
+Command()
+NetLoad()
+GetCadInterfaceObject()
+GetLayerStateManager()
+GetState()
+MajorVersion()
+PostCommand()
+GetAcCmColor()
+GetSecurityParams()
+OpenFile()
+SendCopyData()
+
+ 
+*/
+
+
+
+
+//AppJsObject.autocad.ActiveDocument 的属性 方法
+/**   
+ ModelSpace _get
+ PaperSpace _get
+ Blocks _get
+ CopyObjects(pointer , pointer , pointer&)
+ Groups _get
+ DimStyles _get
+ Layers _get
+ Linetypes _get
+ Dictionaries _get
+ RegisteredApplications _get
+ TextStyles _get
+ UserCoordinateSystems _get
+ Views _get
+ Viewports _get
+ ElevationModelSpace _get
+ ElevationModelSpace(double)
+ ElevationPaperSpace _get
+ ElevationPaperSpace(double)
+ Limits _get
+ Limits(pointer)
+ HandleToObject(string)
+ ObjectIdToObject(pointer)
+ Layouts _get
+ PlotConfigurations _get
+ Preferences _get
+ SummaryInfo _get
+ SectionManager _get
+ Materials _get
+ Plot _get
+ ActiveLayer _get
+ ActiveLayer(pointer)
+ ActiveLinetype _get
+ ActiveLinetype(pointer)
+ ActiveDimStyle _get
+ ActiveDimStyle(pointer)
+ ActiveTextStyle _get
+ ActiveTextStyle(pointer)
+ ActiveUCS _get
+ ActiveUCS(pointer)
+ ActiveViewport _get
+ ActiveViewport(pointer)
+ ActivePViewport _get
+ ActivePViewport(pointer)
+ ActiveSpace _get
+ ActiveSpace(pointer)
+ SelectionSets _get
+ ActiveSelectionSet _get
+ FullName _get
+ Name _get
+ Path _get
+ ObjectSnapMode _get
+ ObjectSnapMode(bool)
+ ReadOnly _get
+ Saved _get
+ MSpace _get
+ MSpace(bool)
+ Utility _get
+ Open(string, pointer)
+ AuditInfo(bool)
+ Import(string, pointer, double)
+ Export(string, string, pointer)
+ New(string)
+ Save()
+ SaveAs(string, pointer, pointer)
+ Wblock(string, pointer)
+ PurgeAll()
+ GetVariable(string)
+ SetVariable(string, pointer)
+ LoadShapeFile(string)
+ Regen(pointer)
+ PickfirstSelectionSet _get
+ Active _get
+ Activate()
+ Close(pointer, pointer)
+ WindowState(pointer)
+ WindowState _get
+ Width(int)
+ Width _get
+ Height(int)
+ Height _get
+ ActiveLayout(pointer)
+ ActiveLayout _get
+ SendCommand(string)
+ HWND _get
+ WindowTitle _get
+ Application _get
+ Database _get
+ StartUndoMark()
+ EndUndoMark()
+ ActiveMaterial _get
+ ActiveMaterial(pointer)
+ PostCommand(string)
+
+
+*/
+
+</script>
+</body>
+</html>
